@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Upload, X, CheckCircle2 } from "lucide-react";
 
-async function compressImage(file: File, maxWidth = 800, quality = 0.7): Promise<Blob> {
+async function compressImage(file: File, maxWidth = 600, quality = 0.5): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -51,10 +51,10 @@ export default function LibraryEdit() {
   const [sortOrder, setSortOrder] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [pendingPreviews, setPendingPreviews] = useState<string[]>([]);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [shortCode, setShortCode] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (existing) {
@@ -109,35 +109,19 @@ export default function LibraryEdit() {
     const files = e.target.files;
     if (!files?.length) return;
     setUploading(true);
-    const newPhotos = [...photos];
-    const progress: Record<string, number> = {};
 
-    // Upload all files concurrently
+    // Show instant local previews
+    const localUrls = Array.from(files).map((f) => URL.createObjectURL(f));
+    setPendingPreviews(localUrls);
+
     const uploadPromises = Array.from(files).map(async (file) => {
-      const fileId = file.name + Date.now();
-      progress[fileId] = 0;
-      setUploadProgress({ ...progress });
-
       try {
-        // Always compress to webp for speed
         const uploadFile = await compressImage(file);
-        progress[fileId] = 50;
-        setUploadProgress({ ...progress });
-
-        const ext = "webp";
-        const path = `${crypto.randomUUID()}.${ext}`;
+        const path = `${crypto.randomUUID()}.webp`;
         const { error } = await supabase.storage
           .from("library-photos")
           .upload(path, uploadFile, { contentType: "image/webp", upsert: false });
-
-        if (error) {
-          toast.error(`Upload failed: ${error.message}`);
-          return null;
-        }
-
-        progress[fileId] = 100;
-        setUploadProgress({ ...progress });
-
+        if (error) { toast.error(`Upload failed: ${error.message}`); return null; }
         const { data } = supabase.storage.from("library-photos").getPublicUrl(path);
         return data.publicUrl;
       } catch {
@@ -148,13 +132,14 @@ export default function LibraryEdit() {
 
     const results = await Promise.all(uploadPromises);
     const validUrls = results.filter(Boolean) as string[];
-    const finalPhotos = [...newPhotos, ...validUrls];
-    setPhotos(finalPhotos);
+    // Clean up local previews
+    localUrls.forEach((u) => URL.revokeObjectURL(u));
+    setPendingPreviews([]);
+    setPhotos((prev) => [...prev, ...validUrls]);
     setUploading(false);
-    setUploadProgress({});
     if (validUrls.length) toast.success(`${validUrls.length} photo(s) uploaded!`);
     e.target.value = "";
-  }, [photos]);
+  }, []);
 
   const removePhoto = (index: number) => setPhotos((p) => p.filter((_, i) => i !== index));
 
@@ -162,7 +147,7 @@ export default function LibraryEdit() {
     return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
 
-  const uploadingCount = Object.keys(uploadProgress).length;
+  const allPhotos = [...photos, ...pendingPreviews];
 
   return (
     <div className="mx-auto max-w-2xl animate-fade-in">
@@ -235,16 +220,23 @@ export default function LibraryEdit() {
         <div>
           <Label>Photos</Label>
           <div className="mt-2 grid grid-cols-3 gap-3">
-            {photos.map((url, i) => (
+            {allPhotos.map((url, i) => (
               <div key={i} className="relative aspect-video overflow-hidden rounded-lg border animate-fade-in-fast">
                 <img src={url} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
-                <button
-                  type="button"
-                  onClick={() => removePhoto(i)}
-                  className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground transition-gpu hover:scale-110"
-                >
-                  <X className="h-3 w-3" />
-                </button>
+                {i < photos.length && (
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(i)}
+                    className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground transition-gpu hover:scale-110"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+                {i >= photos.length && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  </div>
+                )}
               </div>
             ))}
             <label className="flex aspect-video cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-input transition-gpu hover:border-primary hover:bg-primary/5">
@@ -252,7 +244,7 @@ export default function LibraryEdit() {
               {uploading ? (
                 <div className="flex flex-col items-center gap-1">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  <span className="text-xs text-muted-foreground">{uploadingCount} file(s)…</span>
+                  <span className="text-xs text-muted-foreground">Uploading…</span>
                 </div>
               ) : (
                 <>

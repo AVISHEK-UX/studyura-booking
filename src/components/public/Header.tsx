@@ -1,4 +1,4 @@
-import { BookOpen, User, CalendarDays } from "lucide-react";
+import { BookOpen, User, CalendarDays, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -34,6 +34,15 @@ export default function Header() {
               </Link>
             )
           )}
+          <a
+            href="https://wa.me/918960031211?text=I%20need%20to%20list%20my%20library"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <MessageCircle className="h-4 w-4" />
+            List My Library
+          </a>
           <Link
             to="/admin/login"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
