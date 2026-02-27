@@ -11,16 +11,16 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Upload, X, CheckCircle2 } from "lucide-react";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-
-async function compressImage(file: File, maxWidth = 1200, quality = 0.8): Promise<Blob> {
+async function compressImage(file: File, maxWidth = 800, quality = 0.7): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+    const url = URL.createObjectURL(file);
     img.onload = () => {
+      URL.revokeObjectURL(url);
       const canvas = document.createElement("canvas");
       const ratio = Math.min(maxWidth / img.width, 1);
-      canvas.width = img.width * ratio;
-      canvas.height = img.height * ratio;
+      canvas.width = Math.round(img.width * ratio);
+      canvas.height = Math.round(img.height * ratio);
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(
@@ -29,8 +29,8 @@ async function compressImage(file: File, maxWidth = 1200, quality = 0.8): Promis
         quality
       );
     };
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
+    img.src = url;
   });
 }
 
@@ -119,13 +119,10 @@ export default function LibraryEdit() {
       setUploadProgress({ ...progress });
 
       try {
-        // Compress if larger than 2MB
-        let uploadFile: Blob | File = file;
-        if (file.size > MAX_FILE_SIZE) {
-          uploadFile = await compressImage(file);
-          progress[fileId] = 30;
-          setUploadProgress({ ...progress });
-        }
+        // Always compress to webp for speed
+        const uploadFile = await compressImage(file);
+        progress[fileId] = 50;
+        setUploadProgress({ ...progress });
 
         const ext = "webp";
         const path = `${crypto.randomUUID()}.${ext}`;
