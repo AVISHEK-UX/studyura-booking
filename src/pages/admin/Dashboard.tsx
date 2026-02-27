@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -12,7 +11,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, IndianRupee } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Library } from "@/lib/types";
 
@@ -55,12 +54,12 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">Libraries</h1>
+          <h1 className="font-display text-xl sm:text-2xl font-bold text-foreground">Libraries</h1>
           <p className="text-sm text-muted-foreground">{libraries?.length ?? 0} total</p>
         </div>
-        <Button asChild className="gap-2">
+        <Button asChild className="gap-2 w-full sm:w-auto">
           <Link to="/admin/library/new">
             <Plus className="h-4 w-4" />
             Add Library
@@ -68,7 +67,64 @@ export default function AdminDashboard() {
         </Button>
       </div>
 
-      <div className="mt-6 rounded-lg border bg-card">
+      {/* Mobile card view */}
+      <div className="mt-4 space-y-3 md:hidden">
+        {isLoading ? (
+          <p className="text-center py-8 text-muted-foreground">Loading...</p>
+        ) : !libraries?.length ? (
+          <p className="text-center py-8 text-muted-foreground">No libraries yet. Add your first one!</p>
+        ) : (
+          libraries.map((lib) => (
+            <div key={lib.id} className="rounded-lg border bg-card p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium text-foreground truncate">{lib.name}</p>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">{lib.address}</p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                    <Link to={`/admin/library/${lib.id}/edit`}>
+                      <Pencil className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete "{lib.name}"?</AlertDialogTitle>
+                        <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteMutation.mutate(lib.id)}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Order: {lib.sort_order}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{lib.is_active ? "Active" : "Inactive"}</span>
+                  <Switch
+                    checked={lib.is_active}
+                    onCheckedChange={(checked) =>
+                      toggleMutation.mutate({ id: lib.id, is_active: checked })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="mt-6 rounded-lg border bg-card hidden md:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -82,23 +138,17 @@ export default function AdminDashboard() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                  Loading...
-                </TableCell>
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
               </TableRow>
             ) : !libraries?.length ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                  No libraries yet. Add your first one!
-                </TableCell>
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No libraries yet. Add your first one!</TableCell>
               </TableRow>
             ) : (
               libraries.map((lib) => (
                 <TableRow key={lib.id}>
                   <TableCell className="font-medium">{lib.name}</TableCell>
-                  <TableCell className="max-w-[200px] truncate text-muted-foreground">
-                    {lib.address}
-                  </TableCell>
+                  <TableCell className="max-w-[200px] truncate text-muted-foreground">{lib.address}</TableCell>
                   <TableCell>{lib.sort_order}</TableCell>
                   <TableCell>
                     <Switch
@@ -124,15 +174,11 @@ export default function AdminDashboard() {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete "{lib.name}"?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone.
-                            </AlertDialogDescription>
+                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteMutation.mutate(lib.id)}>
-                              Delete
-                            </AlertDialogAction>
+                            <AlertDialogAction onClick={() => deleteMutation.mutate(lib.id)}>Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
