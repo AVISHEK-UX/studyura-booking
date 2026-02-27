@@ -3,6 +3,19 @@ import { Link } from "react-router-dom";
 import type { Library } from "@/lib/types";
 import OptimizedImage from "./OptimizedImage";
 
+function getThumbUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.pathname.includes("/storage/v1/object/public/")) {
+      u.pathname = u.pathname.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
+      u.searchParams.set("width", "400");
+      u.searchParams.set("quality", "60");
+      return u.toString();
+    }
+  } catch {}
+  return url;
+}
+
 export default function LibraryCard({ library }: { library: Library }) {
   const pricing = library.pricing as Record<string, number>;
   const monthlyPrice = pricing?.monthly ?? pricing?.daily;
@@ -16,7 +29,7 @@ export default function LibraryCard({ library }: { library: Library }) {
       <div className="aspect-[4/3] overflow-hidden bg-muted">
         {library.photos && library.photos.length > 0 ? (
           <OptimizedImage
-            src={library.photos[0]}
+            src={getThumbUrl(library.photos[0])}
             alt={library.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             aspectRatio="aspect-[4/3]"
