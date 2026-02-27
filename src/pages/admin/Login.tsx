@@ -13,17 +13,30 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [hint, setHint] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error: err } = await signIn(email, password);
-    if (err) {
-      setError(err);
+    setHint("");
+
+    // Show hint after 3s if still loading
+    const hintTimer = setTimeout(() => setHint("Waking up the server… this may take a few seconds on first load."), 3000);
+
+    try {
+      const { error: err } = await signIn(email, password);
+      clearTimeout(hintTimer);
+      if (err) {
+        setError(err);
+        setLoading(false);
+      } else {
+        navigate("/admin/dashboard");
+      }
+    } catch {
+      clearTimeout(hintTimer);
+      setError("Connection failed. Please try again.");
       setLoading(false);
-    } else {
-      navigate("/admin/dashboard");
     }
   };
 
@@ -64,6 +77,7 @@ export default function AdminLogin() {
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
+          {hint && !error && <p className="text-sm text-muted-foreground animate-pulse">{hint}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
