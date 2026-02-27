@@ -17,7 +17,29 @@ import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+import { supabase } from "@/integrations/supabase/client";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
+  },
+});
+
+// Prefetch libraries so data is ready before user sees the page
+queryClient.prefetchQuery({
+  queryKey: ["libraries"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("libraries")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (error) throw error;
+    return data;
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

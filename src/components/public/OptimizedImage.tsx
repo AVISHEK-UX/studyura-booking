@@ -22,7 +22,7 @@ export default function OptimizedImage({ src, alt, className = "", aspectRatio }
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "400px" }
     );
     observer.observe(el);
     return () => observer.disconnect();

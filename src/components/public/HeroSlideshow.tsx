@@ -39,6 +39,8 @@ export default function HeroSlideshow() {
           key={i}
           src={slide.src}
           alt={slide.alt}
+          loading={i === 0 ? "eager" : "lazy"}
+          {...(i === 0 ? { fetchPriority: "high" } : {})}
           className="absolute inset-0 h-full w-full object-cover"
           style={{
             opacity: i === current ? 1 : 0,
