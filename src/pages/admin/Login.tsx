@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Loader2 } from "lucide-react";
+import { BookOpen, Loader2, ArrowLeft } from "lucide-react";
 
 export default function AdminLogin() {
   const { signIn } = useAuth();
@@ -42,6 +42,10 @@ export default function AdminLogin() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Link to="/" className="absolute left-4 top-4 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="h-4 w-4" />
+        Back to Home
+      </Link>
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
