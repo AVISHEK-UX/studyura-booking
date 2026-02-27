@@ -41,7 +41,7 @@ serve(async (req) => {
       body: JSON.stringify({
         amount: amountInPaise,
         currency,
-        receipt: receipt || `rcpt_${Date.now()}`,
+        receipt: (receipt || `rcpt_${Date.now()}`).substring(0, 40),
         notes: notes || {},
       }),
     });
