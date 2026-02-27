@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpen, LayoutDashboard, Plus, Settings, LogOut, CalendarCheck, Menu, X } from "lucide-react";
+import { BookOpen, LayoutDashboard, Plus, Settings, LogOut, CalendarCheck, Menu, X, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 
@@ -42,7 +42,17 @@ export default function AdminSidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-sidebar-border p-3">
+      <div className="border-t border-sidebar-border p-3 space-y-1">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          asChild
+        >
+          <Link to="/">
+            <Home className="h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
