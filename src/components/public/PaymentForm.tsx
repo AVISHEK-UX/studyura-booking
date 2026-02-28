@@ -168,7 +168,9 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
       }
 
       // Step 1: Create draft booking (PENDING_PAYMENT)
-      const { data: draftBooking, error: draftErr } = await supabase.from("bookings").insert({
+      const draftId = crypto.randomUUID();
+      const { error: draftErr } = await supabase.from("bookings").insert({
+        id: draftId,
         library_name: libraryName,
         library_id: libraryId,
         customer_name: data.name,
@@ -179,9 +181,9 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         amount,
         plan: data.plan,
         status: "PENDING_PAYMENT",
-      }).select("id").single();
+      });
 
-      if (draftErr || !draftBooking) throw new Error(draftErr?.message || "Failed to create booking draft");
+      if (draftErr) throw new Error(draftErr.message || "Failed to create booking draft");
 
       // Step 2: Create Razorpay order
       const { data: orderData, error: orderError } = await supabase.functions.invoke(
@@ -189,7 +191,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         {
           body: {
             amount, currency: "INR",
-            receipt: `booking_${draftBooking.id}`,
+            receipt: `booking_${draftId}`,
             notes: { library: libraryName, shift: data.shift, plan: data.plan, customer_name: data.name },
           },
         }
@@ -197,7 +199,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
 
       if (orderError || !orderData?.order_id) {
         // Mark draft as cancelled
-        await supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftBooking.id);
+        await supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftId);
         throw new Error(orderError?.message || "Failed to create payment order");
       }
 
@@ -222,7 +224,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,
-                  booking_row_id: draftBooking.id,
+                  booking_row_id: draftId,
                 },
               }
             );
@@ -268,7 +270,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         modal: {
           ondismiss: () => {
             // User closed Razorpay — mark draft cancelled
-            supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftBooking.id);
+            supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftId);
             setIsSubmitting(false);
           },
         },
@@ -276,7 +278,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
 
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", async (response: any) => {
-        await supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftBooking.id);
+        await supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftId);
         setPaymentError(response.error?.description || "Payment failed. Please try again.");
         setIsSubmitting(false);
       });
