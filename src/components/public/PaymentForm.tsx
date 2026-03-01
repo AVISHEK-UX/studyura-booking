@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { SlideButton } from "@/components/ui/slide-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -443,12 +444,10 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
 
         <div className="flex flex-col gap-2">
           {receipt.whatsappUrl && (
-            <Button asChild className="w-full gap-2">
-              <a href={receipt.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <MessageCircle className="h-4 w-4" />
-                Continue to WhatsApp
-              </a>
-            </Button>
+            <SlideButton
+              onConfirm={() => window.open(receipt.whatsappUrl, "_blank")}
+              label="Confirm Your Booking"
+            />
           )}
           <Button onClick={handleCopyMessage} variant="outline" className="w-full gap-2">
             <Copy className="h-4 w-4" />
