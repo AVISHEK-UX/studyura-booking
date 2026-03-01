@@ -25,13 +25,16 @@ export default function AdminLogin() {
     const hintTimer = setTimeout(() => setHint("Waking up the server… this may take a few seconds on first load."), 3000);
 
     try {
-      const { error: err } = await signIn(email, password);
+      const result = await signIn(email, password);
       clearTimeout(hintTimer);
-      if (err) {
-        setError(err);
+      if (result.error) {
+        setError(result.error);
         setLoading(false);
-      } else {
+      } else if (result.isAdmin) {
         navigate("/admin/dashboard");
+      } else {
+        setError("You do not have admin access.");
+        setLoading(false);
       }
     } catch {
       clearTimeout(hintTimer);

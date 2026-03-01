@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null; isAdmin: boolean }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithOtp: (email: string) => Promise<{ error: string | null }>;
   verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAdmin: false,
   loading: true,
-  signIn: async () => ({ error: null }),
+  signIn: async () => ({ error: null, isAdmin: false }),
   signUp: async () => ({ error: null }),
   signInWithOtp: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
@@ -39,9 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_, session) => {
+    async (_, session) => {
         setUser(session?.user ?? null);
         if (session?.user) {
+          setLoading(true);
           await checkAdmin(session.user.id);
         } else {
           setIsAdmin(false);
@@ -66,7 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!error && data.user) {
       await checkAdmin(data.user.id);
     }
-    return { error: error?.message ?? null };
+    const adminStatus = !error && data?.user ? await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" as const }).then(r => !!r.data) : false;
+    return { error: error?.message ?? null, isAdmin: adminStatus };
   };
 
   const signUp = async (email: string, password: string) => {
