@@ -1,35 +1,42 @@
 
 
-## Integrate Modern Animated Footer
+## Airbnb-Style Morphing Navbar
 
-Add a branded footer component to the Index page, replacing the current simple footer. Adapted from the provided Next.js component to work with React Router and the studyura brand.
+Transform the current static glassmorphism navbar into a two-state navbar that starts full-width with the brand's light gray/white theme color at the top, then morphs into a compact centered pill/oval shape on scroll.
+
+### Behavior
+
+**State 1 -- At Top (scrollY < 60)**
+- Full-width navbar spanning the entire viewport
+- Light gray-white background (matching the uploaded screenshot: `bg-[#e8e8e8]`)
+- Regular height (~64-72px)
+- Normal rectangular shape
+- No shadow
+
+**State 2 -- After Scroll (scrollY >= 60)**
+- Compact, centered pill-shaped navbar (max-width ~900px, border-radius: 9999px)
+- White/light background with soft shadow
+- Smaller height (~52-56px)
+- Subtle border and shadow for depth
+- Smooth 250ms transition on width, height, border-radius, background, shadow, and padding
 
 ### What Changes
 
-**1. Copy uploaded logo to `src/assets/logo-2.png`**
-- The user uploaded a new green hexagonal "S" logo that will be used in the footer's bottom logo section.
-
-**2. Create `src/components/ui/modem-animated-footer.tsx`**
-- Port the provided Next.js footer component to React Router (replace `next/link` with `react-router-dom` `Link`)
-- Remove the `next` dependency entirely -- it's not needed
-- Keep all Tailwind styling, animations, and layout structure
-- Uses `lucide-react` icons (already installed)
-- The component accepts props for brand name, description, social links, nav links, and brand icon
-
-**3. Update `src/pages/Index.tsx`**
-- Replace the current simple `<footer>` block (lines 249-254) with the new `Footer` component
-- Configure it with studyura branding:
-  - Brand name: "studyura"
-  - Brand description: "Find your perfect study space."
-  - Social links: Customer care phone (8881189088) and email (studyura.helpdesk@gmail.com) only -- no social media
-  - Nav links: relevant app pages (e.g., Home, My Bookings, Login)
-  - Brand icon: the uploaded studyura logo (`logo-2.png`)
+**1. Update `src/components/public/Header.tsx`**
+- Add a `useEffect` scroll listener that toggles an `isScrolled` boolean when `scrollY >= 60`
+- Respect `prefers-reduced-motion` -- skip animations if user prefers reduced motion
+- Apply conditional classes to the `<header>` element:
+  - Top state: full-width, light gray bg (`bg-[#e8e8e8]`), no rounded corners, no shadow
+  - Scrolled state: `max-w-[900px] mx-auto rounded-full shadow-lg bg-white/95 backdrop-blur-xl` with top margin for spacing
+- Wrap the header in a fixed container div so the pill can center itself
+- Adjust inner padding/height to shrink in scrolled state
+- Mobile: scrolled state remains near full-width but with rounded corners for usability
+- Text colors adapt: muted tones in both states for readability against the light backgrounds
 
 ### Technical Details
 
-- **No new npm dependencies** -- `next` is NOT installed; the component is converted to use `react-router-dom` `Link` (already installed) and standard `<a>` tags for external links
-- `lucide-react` is already installed -- uses `Phone` and `Mail` icons for customer support links
-- The large background text watermark will display "STUDYURA"
-- The footer's dark theme (zinc/neutral backgrounds) will contrast with the main page, creating a clear visual separation
-- The component uses `cn()` from `@/lib/utils` for class merging (already available)
-
+- Scroll listener uses `requestAnimationFrame` or passive event listener for performance
+- All animated properties use CSS `transition-all duration-250 ease-in-out`
+- `z-50` stays on the outer wrapper to remain above the hero slideshow
+- No layout shifts -- uses `fixed top-0` positioning with a wrapper
+- The mobile hamburger menu and dropdown remain functional in both states
