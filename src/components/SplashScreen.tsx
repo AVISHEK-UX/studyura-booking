@@ -27,7 +27,7 @@ const SplashScreen = () => {
     >
       <img
         src={logo}
-        alt="StudySpot logo"
+        alt="StudyUra logo"
         className="w-24 h-24 md:w-32 md:h-32"
         style={{ animation: "splashLogoIn 0.8s ease-out both, splashPulse 2s ease-in-out 0.8s infinite" }}
       />
@@ -35,7 +35,7 @@ const SplashScreen = () => {
         className="mt-4 text-2xl md:text-3xl font-bold tracking-wide text-primary-foreground"
         style={{ fontFamily: "var(--font-display)", animation: "splashTextIn 0.6s ease-out 0.5s both" }}
       >
-        StudySpot
+        StudyUra
       </span>
     </div>
   );
