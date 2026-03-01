@@ -86,8 +86,8 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="StudyUra logo" className="h-9 w-9 rounded-lg object-contain" />
-          <span className="font-display text-xl font-bold text-foreground">StudyUra</span>
+          <img src={logo} alt="studyura logo" className="h-8 w-8 rounded-lg object-contain" />
+          <span className="font-display text-lg font-bold text-foreground">studyura</span>
         </Link>
 
         {/* Desktop nav */}
