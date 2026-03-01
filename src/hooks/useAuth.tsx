@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect, useRef, createContext, useContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -28,18 +28,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const signingIn = useRef(false);
 
-  const checkAdmin = async (userId: string) => {
+  const checkAdmin = async (userId: string): Promise<boolean> => {
     const { data } = await supabase.rpc("has_role", {
       _user_id: userId,
       _role: "admin",
     });
     setIsAdmin(!!data);
+    return !!data;
   };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
     async (_, session) => {
+        if (signingIn.current) return;
         setUser(session?.user ?? null);
         if (session?.user) {
           setLoading(true);
@@ -63,12 +66,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error && data.user) {
-      await checkAdmin(data.user.id);
+    signingIn.current = true;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return { error: error.message, isAdmin: false };
+      const adminStatus = await checkAdmin(data.user.id);
+      setUser(data.user);
+      return { error: null, isAdmin: adminStatus };
+    } finally {
+      signingIn.current = false;
     }
-    const adminStatus = !error && data?.user ? await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" as const }).then(r => !!r.data) : false;
-    return { error: error?.message ?? null, isAdmin: adminStatus };
   };
 
   const signUp = async (email: string, password: string) => {
