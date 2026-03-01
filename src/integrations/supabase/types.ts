@@ -41,6 +41,7 @@ export type Database = {
           base_amount: number | null
           booking_id: string | null
           created_at: string
+          customer_email: string | null
           customer_name: string
           customer_phone: string | null
           discount_applied: Json | null
@@ -62,6 +63,7 @@ export type Database = {
           base_amount?: number | null
           booking_id?: string | null
           created_at?: string
+          customer_email?: string | null
           customer_name: string
           customer_phone?: string | null
           discount_applied?: Json | null
@@ -83,6 +85,7 @@ export type Database = {
           base_amount?: number | null
           booking_id?: string | null
           created_at?: string
+          customer_email?: string | null
           customer_name?: string
           customer_phone?: string | null
           discount_applied?: Json | null

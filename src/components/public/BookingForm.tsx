@@ -48,6 +48,7 @@ export default function BookingForm({ libraryName, shifts }: BookingFormProps) {
         library_name: libraryName,
         customer_name: data.name,
         customer_phone: data.phone || null,
+        customer_email: user?.email || null,
         preferred_date: data.date,
         preferred_shift: data.shift,
         user_id: user?.id ?? null,
