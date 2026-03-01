@@ -1,42 +1,47 @@
 
 
-## Airbnb-Style Morphing Navbar
+## Three Fixes: Navbar, Auto-fill Booking, Session Persistence
 
-Transform the current static glassmorphism navbar into a two-state navbar that starts full-width with the brand's light gray/white theme color at the top, then morphs into a compact centered pill/oval shape on scroll.
+### 1. Desktop Navbar -- Keep Full-Width (No Pill Morph)
 
-### Behavior
+**File: `src/components/public/Header.tsx`**
 
-**State 1 -- At Top (scrollY < 60)**
-- Full-width navbar spanning the entire viewport
-- Light gray-white background (matching the uploaded screenshot: `bg-[#e8e8e8]`)
-- Regular height (~64-72px)
-- Normal rectangular shape
-- No shadow
+The scroll-based pill morphing will only apply on mobile (below `md` breakpoint). On desktop (`md` and above), the navbar stays full-width with the `bg-[#e8e8e8]` background at all times.
 
-**State 2 -- After Scroll (scrollY >= 60)**
-- Compact, centered pill-shaped navbar (max-width ~900px, border-radius: 9999px)
-- White/light background with soft shadow
-- Smaller height (~52-56px)
-- Subtle border and shadow for depth
-- Smooth 250ms transition on width, height, border-radius, background, shadow, and padding
+- Use `useIsMobile()` hook (already exists at `src/hooks/use-mobile.tsx`) to detect screen size
+- Only apply the pill/rounded styling when `isScrolled && isMobile`
+- Desktop always gets the full-width rectangular navbar with consistent height
 
-### What Changes
+### 2. Auto-Fill Booking Form for Returning Users
 
-**1. Update `src/components/public/Header.tsx`**
-- Add a `useEffect` scroll listener that toggles an `isScrolled` boolean when `scrollY >= 60`
-- Respect `prefers-reduced-motion` -- skip animations if user prefers reduced motion
-- Apply conditional classes to the `<header>` element:
-  - Top state: full-width, light gray bg (`bg-[#e8e8e8]`), no rounded corners, no shadow
-  - Scrolled state: `max-w-[900px] mx-auto rounded-full shadow-lg bg-white/95 backdrop-blur-xl` with top margin for spacing
-- Wrap the header in a fixed container div so the pill can center itself
-- Adjust inner padding/height to shrink in scrolled state
-- Mobile: scrolled state remains near full-width but with rounded corners for usability
-- Text colors adapt: muted tones in both states for readability against the light backgrounds
+**File: `src/components/public/PaymentForm.tsx`**
 
-### Technical Details
+When a logged-in user opens the booking form, auto-populate the name and phone fields from their most recent booking.
 
-- Scroll listener uses `requestAnimationFrame` or passive event listener for performance
-- All animated properties use CSS `transition-all duration-250 ease-in-out`
-- `z-50` stays on the outer wrapper to remain above the hero slideshow
-- No layout shifts -- uses `fixed top-0` positioning with a wrapper
-- The mobile hamburger menu and dropdown remain functional in both states
+- Add a `useEffect` that runs when the component mounts (and `user` is present)
+- Query the `bookings` table for the user's latest booking: `select customer_name, customer_phone from bookings where user_id = ? order by created_at desc limit 1`
+- If found, call `setValue("name", ...)` and `setValue("phone", ...)` to pre-fill the form
+- Also fall back to `user.user_metadata.full_name` for the name field if no prior booking exists
+
+### 3. Session Persistence Across Refresh
+
+**File: `src/hooks/useAuth.tsx`**
+
+The current auth implementation already uses `supabase.auth.getSession()` on mount and `onAuthStateChange` listener, which should persist sessions across refreshes (Supabase stores tokens in localStorage by default). 
+
+However, a potential issue is that the `loading` state might cause a brief flash that looks like a logout. The fix:
+
+- Ensure `loading` stays `true` until the session is fully restored
+- Verify that `onAuthStateChange` with `TOKEN_REFRESHED` events properly maintains the user state
+- Add a check: if `getSession` returns a session, trust it immediately without waiting for the auth state change event
+
+This should already be working correctly based on the code, but we will add defensive checks to ensure no race condition causes a momentary logged-out state on refresh.
+
+### Technical Summary
+
+| Change | File | What |
+|--------|------|------|
+| Desktop navbar stays full-width | `Header.tsx` | Use `useIsMobile()` to gate pill morph |
+| Auto-fill booking details | `PaymentForm.tsx` | Query last booking on mount, pre-fill name/phone |
+| Session persists on refresh | `useAuth.tsx` | Defensive loading state, no premature user=null |
+
