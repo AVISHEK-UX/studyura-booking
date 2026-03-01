@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/public/Header";
@@ -23,10 +23,10 @@ export default function Login() {
 
   const redirectTo = searchParams.get("redirect") || "/";
 
-  if (user) {
-    navigate(redirectTo, { replace: true });
-    return null;
-  }
+  // Redirect if already logged in (use useEffect to avoid render-time navigation)
+  useEffect(() => {
+    if (user) navigate(redirectTo, { replace: true });
+  }, [user, redirectTo, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

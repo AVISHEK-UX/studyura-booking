@@ -1,14 +1,27 @@
-import { BookOpen, User, CalendarDays, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { BookOpen, User, CalendarDays, MessageCircle, LogOut, ChevronDown } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const displayName = user?.user_metadata?.full_name
     || user?.email?.split("@")[0]
     || "User";
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
@@ -22,26 +35,28 @@ export default function Header() {
         <nav className="flex items-center gap-3">
           {!loading && (
             user ? (
-              <>
-                <Link
-                  to="/my-bookings"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent focus:outline-none">
                   <Avatar className="h-6 w-6">
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                       {displayName.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <span className="max-w-[120px] truncate">{displayName}</span>
-                </Link>
-                <Link
-                  to="/my-bookings"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <CalendarDays className="h-4 w-4" />
-                  My Bookings
-                </Link>
-              </>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate("/my-bookings")} className="cursor-pointer gap-2">
+                    <CalendarDays className="h-4 w-4" />
+                    My Bookings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer gap-2 text-destructive focus:text-destructive">
+                    <LogOut className="h-4 w-4" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link
                 to="/login"
