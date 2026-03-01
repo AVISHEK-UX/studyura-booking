@@ -57,7 +57,7 @@ export default function LibraryCard({ library }: { library: Library }) {
       to={`/library/${library.id}`}
       className="group block overflow-hidden rounded-lg border bg-card shadow-card transition-gpu hover:shadow-card-hover hover:-translate-y-1"
     >
-      <div className="aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {library.photos && library.photos.length > 0 ? (
           <OptimizedImage
             src={getThumbUrl(library.photos[0])}
@@ -69,6 +69,11 @@ export default function LibraryCard({ library }: { library: Library }) {
           <div className="flex h-full items-center justify-center">
             <BookPlaceholder />
           </div>
+        )}
+        {discountLabel && (
+          <span className="absolute top-2 left-2 rounded-md bg-destructive px-2 py-1 text-xs font-bold text-destructive-foreground shadow-md">
+            {discountLabel}
+          </span>
         )}
       </div>
       <div className="p-4">
