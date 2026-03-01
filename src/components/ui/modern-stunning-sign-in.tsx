@@ -7,6 +7,7 @@ type AuthMode = "signin" | "signup";
 interface SignIn1Props {
   onSignIn: (email: string, password: string) => Promise<void>;
   onSignUp: (email: string, password: string, fullName: string) => Promise<void>;
+  onGoogleSignIn?: () => Promise<void>;
   loading?: boolean;
   error?: string;
   success?: string;
@@ -19,7 +20,7 @@ const avatars = [
   "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=80&h=80&fit=crop&crop=face",
 ];
 
-const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: externalError, success }) => {
+const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, onGoogleSignIn, loading, error: externalError, success }) => {
   const [mode, setMode] = React.useState<AuthMode>("signin");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -135,9 +136,10 @@ const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: e
             {mode === "signin" ? "Sign in" : "Create account"}
           </button>
 
-          {/* Google placeholder */}
+          {/* Google Sign In */}
           <button
             type="button"
+            onClick={onGoogleSignIn}
             className="flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
