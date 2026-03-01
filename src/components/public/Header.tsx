@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +16,14 @@ export default function Header() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY >= 60);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const displayName = user?.user_metadata?.full_name
     || user?.email?.split("@")[0]
@@ -83,34 +91,57 @@ export default function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-white/30 backdrop-blur-xl backdrop-saturate-150 shadow-sm transition-all duration-300">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="studyura logo" className="h-8 w-8 rounded-lg object-contain" />
-          <span className="font-display text-lg font-bold text-foreground">studyura</span>
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-3">
-          {navLinks}
-        </nav>
-
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden p-2 text-foreground"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+    <>
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 ease-in-out motion-reduce:transition-none"
+        style={{ padding: isScrolled ? '8px 16px 0' : '0' }}
+      >
+        <header
+          className={[
+            "w-full transition-all duration-300 ease-in-out motion-reduce:transition-none",
+            isScrolled
+              ? "max-w-[900px] rounded-full bg-white/95 backdrop-blur-xl shadow-lg border border-border/40"
+              : "bg-[#e8e8e8] border-b border-border/20",
+          ].join(" ")}
         >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
+          <div
+            className={[
+              "flex items-center justify-between transition-all duration-300 ease-in-out px-6",
+              isScrolled ? "h-14" : "h-16",
+            ].join(" ")}
+          >
+            <Link to="/" className="flex items-center gap-2">
+              <img src={logo} alt="studyura logo" className={`rounded-lg object-contain transition-all duration-300 ${isScrolled ? 'h-7 w-7' : 'h-8 w-8'}`} />
+              <span className="font-display text-lg font-bold text-foreground">studyura</span>
+            </Link>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <nav className="md:hidden border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 flex flex-col gap-3 animate-fade-in">
-          {navLinks}
-        </nav>
-      )}
-    </header>
+            {/* Desktop nav */}
+            <nav className="hidden md:flex items-center gap-3">
+              {navLinks}
+            </nav>
+
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden p-2 text-foreground"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+
+          {/* Mobile menu */}
+          {mobileOpen && (
+            <nav className={[
+              "md:hidden border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 flex flex-col gap-3 animate-fade-in",
+              isScrolled ? "rounded-b-3xl" : "",
+            ].join(" ")}>
+              {navLinks}
+            </nav>
+          )}
+        </header>
+      </div>
+      {/* Spacer for fixed navbar */}
+      <div className="h-16" />
+    </>
   );
 }
