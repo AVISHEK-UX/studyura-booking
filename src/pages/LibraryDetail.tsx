@@ -14,6 +14,19 @@ interface Discount {
   validTo?: string;
 }
 
+function isDiscountActive(d?: Discount | null): boolean {
+  if (!d || !d.active) return false;
+  const now = new Date();
+  if (d.validFrom && new Date(d.validFrom) > now) return false;
+  if (d.validTo && new Date(d.validTo) < now) return false;
+  return true;
+}
+
+function calcDiscount(price: number, d: Discount): number {
+  if (d.type === "PERCENT") return Math.round(price - (price * d.value / 100));
+  return Math.max(price - d.value, 0);
+}
+
 export default function LibraryDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: library, isLoading } = useLibrary(id!);
@@ -46,6 +59,7 @@ export default function LibraryDetail() {
   const pricing = library.pricing as Record<string, number>;
   const shifts = (library.shifts as string[]) ?? [];
   const discount = (library as any).discount as Discount | null;
+  const hasDiscount = isDiscountActive(discount);
 
   return (
     <div className="min-h-screen">
@@ -84,20 +98,42 @@ export default function LibraryDetail() {
             {/* Pricing */}
             {Object.keys(pricing).length > 0 && (
               <div>
-                <h2 className="font-display text-xl font-semibold text-foreground">Pricing</h2>
+                <div className="flex items-center gap-3">
+                  <h2 className="font-display text-xl font-semibold text-foreground">Pricing</h2>
+                  {hasDiscount && discount && (
+                    <span className="rounded-md bg-destructive px-2 py-0.5 text-xs font-bold text-destructive-foreground">
+                      {discount.type === "PERCENT" ? `${discount.value}% off` : `₹${discount.value} off`}
+                    </span>
+                  )}
+                </div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {Object.entries(pricing).map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between rounded-lg border bg-card p-4"
-                    >
-                      <span className="capitalize text-muted-foreground">{key}</span>
-                      <div className="flex items-center gap-0.5 font-bold text-foreground">
-                        <IndianRupee className="h-4 w-4" />
-                        {value}
+                  {Object.entries(pricing).map(([key, value]) => {
+                    const discounted = hasDiscount && discount ? calcDiscount(value, discount) : null;
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between rounded-lg border bg-card p-4"
+                      >
+                        <span className="capitalize text-muted-foreground">{key}</span>
+                        <div className="flex items-center gap-1.5">
+                          {discounted !== null ? (
+                            <>
+                              <div className="flex items-center gap-0.5 font-bold text-primary">
+                                <IndianRupee className="h-4 w-4" />
+                                {discounted}
+                              </div>
+                              <span className="text-sm text-muted-foreground line-through">₹{value}</span>
+                            </>
+                          ) : (
+                            <div className="flex items-center gap-0.5 font-bold text-foreground">
+                              <IndianRupee className="h-4 w-4" />
+                              {value}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
