@@ -17,6 +17,7 @@ import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
 import LibraryDiscounts from "./pages/admin/LibraryDiscounts";
 import NotFound from "./pages/NotFound";
+import SplashScreen from "./components/SplashScreen";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -46,6 +47,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
+        <SplashScreen />
         <Toaster />
         <Sonner />
         <BrowserRouter>
