@@ -16,10 +16,41 @@ function getThumbUrl(url: string): string {
   return url;
 }
 
+interface Discount {
+  active: boolean;
+  type: "PERCENT" | "FLAT";
+  value: number;
+  validFrom?: string;
+  validTo?: string;
+}
+
+function isDiscountActive(d?: Discount | null): boolean {
+  if (!d || !d.active) return false;
+  const now = new Date();
+  if (d.validFrom && new Date(d.validFrom) > now) return false;
+  if (d.validTo && new Date(d.validTo) < now) return false;
+  return true;
+}
+
 export default function LibraryCard({ library }: { library: Library }) {
   const pricing = library.pricing as Record<string, number>;
   const monthlyPrice = pricing?.monthly ?? pricing?.daily;
   const priceLabel = pricing?.monthly ? "/month" : pricing?.daily ? "/day" : "";
+
+  const discount = (library as any).discount as Discount | null | undefined;
+  const hasDiscount = isDiscountActive(discount);
+  let discountedPrice: number | null = null;
+  let discountLabel = "";
+
+  if (hasDiscount && monthlyPrice && discount) {
+    if (discount.type === "PERCENT") {
+      discountedPrice = Math.round(monthlyPrice - (monthlyPrice * discount.value / 100));
+      discountLabel = `${discount.value}% off`;
+    } else {
+      discountedPrice = Math.max(monthlyPrice - discount.value, 0);
+      discountLabel = `₹${discount.value} off`;
+    }
+  }
 
   return (
     <Link
@@ -49,10 +80,24 @@ export default function LibraryCard({ library }: { library: Library }) {
           <span className="line-clamp-1">{library.address}</span>
         </div>
         {monthlyPrice && (
-          <div className="mt-3 flex items-center gap-0.5">
-            <IndianRupee className="h-4 w-4 text-primary" />
-            <span className="text-lg font-bold text-primary">{monthlyPrice}</span>
-            <span className="text-sm text-muted-foreground">{priceLabel}</span>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
+              <IndianRupee className="h-4 w-4 text-primary" />
+              {discountedPrice !== null ? (
+                <>
+                  <span className="text-lg font-bold text-primary">{discountedPrice}</span>
+                  <span className="text-sm text-muted-foreground line-through ml-1">₹{monthlyPrice}</span>
+                </>
+              ) : (
+                <span className="text-lg font-bold text-primary">{monthlyPrice}</span>
+              )}
+              <span className="text-sm text-muted-foreground">{priceLabel}</span>
+            </div>
+            {discountLabel && (
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                {discountLabel}
+              </span>
+            )}
           </div>
         )}
         {library.amenities && library.amenities.length > 0 && (
