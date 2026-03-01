@@ -2,48 +2,40 @@
 
 ## Problem
 
-The admin login redirects to the home page because of a **race condition** in the auth state management:
+The admin login redirect fails due to a **double-firing race condition**:
 
-1. `signIn()` completes and correctly sets `isAdmin = true`
-2. The admin login page navigates to `/admin/dashboard`
-3. **But** `onAuthStateChange` also fires from the sign-in event, which sets `user` immediately but then starts an async `checkAdmin()` call
-4. During that async gap, `AdminGuard` sees: `loading = false`, `user = exists`, `isAdmin = false` (not yet updated by the listener) -- and redirects to `/`
+1. `signIn()` calls `checkAdmin()` and returns `isAdmin: true`
+2. Admin login page calls `navigate("/admin/dashboard")`
+3. **Simultaneously**, `onAuthStateChange` fires from the sign-in event, which sets `loading = true` and starts **another** async `checkAdmin()` call
+4. During this second check, `AdminGuard` may briefly see `loading = false` + `isAdmin = false` and redirect to `/`
+
+The "waking up server" hint appears because the `signIn` function makes **two** redundant RPC calls to `has_role` (one via `checkAdmin`, another directly), doubling the server round-trips.
 
 ## Fix
 
-### 1. Fix race condition in `useAuth.tsx`
+### 1. Prevent redundant admin checks in `signIn` (`src/hooks/useAuth.tsx`)
 
-Update `onAuthStateChange` to **set loading back to true** whenever a session change happens, preventing `AdminGuard` from making premature redirect decisions while the admin role check is still in progress.
+Remove the duplicate `has_role` RPC call. Instead, after `checkAdmin` completes (which sets `isAdmin` state), read the result directly from a local variable rather than making a second RPC call.
 
-```typescript
-// In onAuthStateChange callback:
-setUser(session?.user ?? null);
-if (session?.user) {
-  setLoading(true);  // <-- prevent premature guard decisions
-  await checkAdmin(session.user.id);
-}
-setLoading(false);
+### 2. Skip `onAuthStateChange` re-check during active sign-in (`src/hooks/useAuth.tsx`)
+
+Add a ref (`signingIn`) that is set to `true` during `signIn()` and `false` after. The `onAuthStateChange` listener will skip its `checkAdmin` call when the ref is true, since `signIn` already handled it. This eliminates the race condition entirely.
+
+```text
+signIn() starts --> signingIn = true
+  |-> checkAdmin() --> sets isAdmin
+  |-> returns { isAdmin }
+  |-> signingIn = false
+
+onAuthStateChange fires:
+  if signingIn.current --> skip checkAdmin (already done)
+  else --> proceed normally (e.g., page refresh, token refresh)
 ```
 
-### 2. Return admin status from `signIn` in `useAuth.tsx`
+### 3. No changes needed to `AdminLogin.tsx` or `AdminGuard.tsx`
 
-Make `signIn` return whether the user is an admin, so the admin login page can make a reliable navigation decision:
-
-```typescript
-const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (!error && data.user) {
-    await checkAdmin(data.user.id);
-  }
-  return { error: error?.message ?? null, isAdmin: !error ? isAdmin : false };
-};
-```
-
-### 3. Update `AdminLogin.tsx` navigation
-
-After sign-in, wait briefly for state to propagate, or check the returned admin status before navigating. This ensures the guard won't see stale state.
+The existing login page and guard logic are correct -- the issue is purely in the auth state management.
 
 ### Files Changed
-- `src/hooks/useAuth.tsx` -- fix race condition in `onAuthStateChange`, loading state management
-- `src/pages/admin/Login.tsx` -- no functional change needed if the race condition fix works
+- `src/hooks/useAuth.tsx` -- Add `signingIn` ref, simplify `signIn` to remove duplicate RPC, skip redundant `onAuthStateChange` check during sign-in
 
