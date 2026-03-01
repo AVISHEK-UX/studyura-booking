@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 export default function Login() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,6 +43,11 @@ export default function Login() {
       return;
     }
 
+    if (mode === "signup" && !fullName.trim()) {
+      setError("Please enter your name");
+      return;
+    }
+
     setLoading(true);
 
     if (mode === "login") {
@@ -53,7 +59,7 @@ export default function Login() {
         navigate(redirectTo, { replace: true });
       }
     } else {
-      const { error: err } = await signUp(email, password);
+      const { error: err } = await signUp(email, password, fullName.trim());
       if (err) {
         setError(err);
         setLoading(false);
@@ -123,6 +129,20 @@ export default function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === "signup" && (
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input
+                  id="fullName"
+                  type="text"
+                  placeholder="Your full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
