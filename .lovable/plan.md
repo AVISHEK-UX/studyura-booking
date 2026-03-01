@@ -1,31 +1,36 @@
 
 
-## Splash Screen with Logo
+## Integrate Modern Stunning Sign-In Page
 
-### What will happen
-A professional splash screen will appear for ~2.5 seconds when the app first loads, showing the uploaded green "S" hexagon logo centered on a dark background with a smooth fade-in animation, a subtle pulse glow effect, and the "StudySpot" brand name. After the duration, it will smoothly fade out and reveal the home screen.
+Replace the current Login page with a modern glassmorphic sign-in design, adapted to the studyura brand and green theme.
 
-### Technical approach
+### What Changes
 
-**1. Copy the logo to the project**
-- Copy `user-uploads://logo.png` to `src/assets/logo.png`
+**1. Create `src/components/ui/modern-stunning-sign-in.tsx`**
+- A full-screen sign-in component with a dark gradient background using the project's green palette (`hsl(152 32% 36%)`)
+- Glassmorphic card with backdrop blur, green-tinted borders
+- StudyUra logo (from `src/assets/logo.png`) instead of "HextaUI"
+- Brand text: "studyura" in lowercase
+- Email and password inputs with green focus rings
+- "Sign in" button in primary green
+- "Continue with Google" button (styled, non-functional placeholder)
+- "Don't have an account? Sign up" link that toggles to signup mode
+- Avatar row at bottom: "Join thousands of students who are already using studyura"
+- Avatars filled with Unsplash stock portrait URLs
 
-**2. Create a `SplashScreen` component** (`src/components/SplashScreen.tsx`)
-- Full-screen overlay with a dark background (matching the app's `--foreground` color)
-- Centered logo image with a scale + fade-in entrance animation
-- "StudySpot" text below the logo with a delayed fade-in
-- After ~2.5 seconds, the entire splash fades out over 0.5s
-- Uses `useState` + `useEffect` with a timer to control visibility
-- Once the fade-out animation completes, the component unmounts entirely
+**2. Update `src/pages/Login.tsx`**
+- Replace the current plain form layout with the new modern sign-in component
+- Keep all existing auth logic (useAuth, redirect, signIn/signUp, error/success handling)
+- Pass auth handlers as props to the new component
+- Support both login and signup modes within the glassmorphic card
+- Remove the Header component (the new design is full-screen standalone)
 
-**3. Update `App.tsx`**
-- Import and render `<SplashScreen />` alongside the existing app content
-- The splash renders as a fixed overlay on top of everything, then disappears
+### Technical Details
 
-**4. Add splash keyframe animations to `src/index.css`**
-- `splashFadeIn`: opacity 0 to 1 + scale up
-- `splashFadeOut`: opacity 1 to 0
-- `splashPulse`: subtle glow pulse on the logo
-
-No other files will be touched.
+- No new dependencies needed -- uses only React, Tailwind classes, lucide-react icons, and the existing logo asset
+- The component uses inline Tailwind for all styling (gradient backgrounds, backdrop-blur, border opacity)
+- Inputs will use custom classes rather than the shadcn Input component to match the dark glassmorphic aesthetic
+- The sign-up mode adds Full Name and Confirm Password fields inside the same card
+- Color mapping: all accent colors use CSS variable `--primary` (green) or direct `hsl(152 32% 36%)` references
+- Responsive: card is max-w-md centered, full-height viewport with overflow-auto for small screens
 
