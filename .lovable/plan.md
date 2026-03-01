@@ -1,31 +1,32 @@
 
 
-## Fix: Show User Email, Ensure Booking ID Visibility, Fix RLS
+## Replace "Continue to WhatsApp" with Slide-to-Confirm Button
 
-### Issues Identified
+### What Changes
 
-1. **RLS policies on bookings are still RESTRICTIVE** -- both "Users can read own bookings" and "Admins can read all bookings" have `Permissive: No`, meaning a user must satisfy BOTH conditions simultaneously (be the owner AND be admin) to see bookings. This is why My Bookings may intermittently fail.
-2. **User email is not stored in bookings** -- the `bookings` table has no email column, so it can't be displayed anywhere.
-3. **Booking ID generation already works** -- the `verify-razorpay-payment` edge function generates a unique `STU-{CODE}-{YYMMDD}-{RANDOM6}` booking ID on successful payment. This just needs to be visible in both user and admin views.
+The "Continue to WhatsApp" button in the payment receipt view will be replaced with a slide-to-confirm button labeled "Confirm Your Booking". When the user slides to confirm, it will open WhatsApp automatically upon success.
 
-### Changes
+### Steps
 
-**1. Database Migration**
-- Add `customer_email` column (text, nullable) to the `bookings` table
-- Drop the two restrictive SELECT policies and recreate them as PERMISSIVE so users can see their own bookings OR admins can see all bookings
+**1. Install framer-motion dependency**
+- Required by the SlideButton component for drag animations
 
-**2. `src/components/public/PaymentForm.tsx`**
-- Store `user.email` as `customer_email` when inserting the draft booking
+**2. Create `src/components/ui/slide-button.tsx`**
+- Copy the provided SlideButton component code
+- Adapt it to accept an `onConfirm` callback prop (instead of the hardcoded timeout/status logic)
+- Change the drag handle icon text/label to show "Confirm Your Booking"
+- On successful slide completion, call the `onConfirm` callback which will open WhatsApp
 
-**3. `src/components/public/BookingForm.tsx`**
-- Store `user.email` as `customer_email` when inserting a booking (WhatsApp-only flow)
+**3. Update `src/components/public/PaymentForm.tsx`**
+- Replace the "Continue to WhatsApp" `<Button>` block (lines 445-452) with the new SlideButton
+- Pass the WhatsApp URL opening logic as the `onConfirm` prop
+- Keep the "Copy Message" and "Print Receipt" buttons unchanged below it
 
-**4. `src/pages/MyBookings.tsx`**
-- Already shows `user?.email` in the header -- no change needed there
-- Booking cards already show `booking_id` -- confirmed working
+### Technical Details
 
-**5. `src/pages/admin/LibraryBookings.tsx`**
-- Add `customer_email` to the Booking type
-- Add an "Email" column to the admin bookings table
-- Show email in the booking detail drawer
+| File | Change |
+|------|--------|
+| `package.json` | Add `framer-motion` dependency |
+| `src/components/ui/slide-button.tsx` | New component -- adapted SlideButton with `onConfirm` prop |
+| `src/components/public/PaymentForm.tsx` | Replace WhatsApp button with SlideButton, label "Confirm Your Booking" |
 
