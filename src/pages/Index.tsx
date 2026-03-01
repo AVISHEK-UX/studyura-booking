@@ -4,9 +4,28 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 import Header from "@/components/public/Header";
 import LibraryCard from "@/components/public/LibraryCard";
 import LocationPrompt from "@/components/public/LocationPrompt";
-import { BookOpen, MapPin, Search, IndianRupee, Navigation } from "lucide-react";
+import { BookOpen, MapPin, Search, IndianRupee, Navigation, Phone, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeroSlideshow from "@/components/public/HeroSlideshow";
+import { Footer } from "@/components/ui/modem-animated-footer";
+import logo2 from "@/assets/logo-2.png";
+
+const StudyuraFooter = () => (
+  <Footer
+    brandName="studyura"
+    brandDescription="Find your perfect study space."
+    socialLinks={[
+      { icon: <Phone className="h-5 w-5" />, href: "tel:8881189088", label: "8881189088" },
+      { icon: <Mail className="h-5 w-5" />, href: "mailto:studyura.helpdesk@gmail.com", label: "studyura.helpdesk@gmail.com" },
+    ]}
+    navLinks={[
+      { label: "Home", href: "/" },
+      { label: "My Bookings", href: "/my-bookings" },
+      { label: "Login", href: "/login" },
+    ]}
+    brandIcon={<img src={logo2} alt="studyura" className="h-full w-full object-contain" />}
+  />
+);
 
 const PRICE_RANGES = [
   { label: "Any Price", value: "all" },
@@ -247,11 +266,7 @@ export default function Index() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-primary-foreground/10 py-8">
-        <div className="container text-center text-sm text-primary-foreground/60">
-          © {new Date().getFullYear()} StudyUra. Find your perfect study space.
-        </div>
-      </footer>
+      <StudyuraFooter />
       </div>
     </div>
   );
