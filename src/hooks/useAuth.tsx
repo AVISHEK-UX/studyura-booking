@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const signingIn = useRef(false);
+  const initialised = useRef(false);
 
   const checkAdmin = async (userId: string): Promise<boolean> => {
     const { data } = await supabase.rpc("has_role", {
@@ -40,27 +41,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-    async (_, session) => {
-        if (signingIn.current) return;
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          setLoading(true);
-          await checkAdmin(session.user.id);
-        } else {
-          setIsAdmin(false);
-        }
-        setLoading(false);
-      }
-    );
-
+    // Restore session first
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         await checkAdmin(session.user.id);
       }
       setLoading(false);
+      initialised.current = true;
     });
+
+    // Listen for subsequent changes (sign-in, sign-out, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        // Skip if signIn() is handling this, or if we haven't initialised yet
+        if (signingIn.current || !initialised.current) return;
+
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          // Fire-and-forget — don't set loading, don't block UI
+          checkAdmin(session.user.id);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    );
 
     return () => subscription.unsubscribe();
   }, []);
