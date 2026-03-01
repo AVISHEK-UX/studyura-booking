@@ -2,7 +2,8 @@ import { useState, useMemo } from "react";
 import { useLibraries } from "@/hooks/useLibraries";
 import Header from "@/components/public/Header";
 import LibraryCard from "@/components/public/LibraryCard";
-import { BookOpen, Loader2, MapPin, Search, IndianRupee } from "lucide-react";
+import { BookOpen, MapPin, Search, IndianRupee } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import HeroSlideshow from "@/components/public/HeroSlideshow";
 
 const PRICE_RANGES = [
@@ -14,7 +15,7 @@ const PRICE_RANGES = [
 ];
 
 export default function Index() {
-  const { data: libraries, isLoading } = useLibraries();
+  const { data: libraries, isLoading, error, refetch } = useLibraries();
   const [selectedCity, setSelectedCity] = useState("all");
   const [searchName, setSearchName] = useState("");
   const [priceRange, setPriceRange] = useState("all");
@@ -28,32 +29,24 @@ export default function Index() {
   const filtered = useMemo(() => {
     if (!libraries) return [];
     return libraries.filter((lib) => {
-      // City filter
       if (selectedCity !== "all" && lib.city !== selectedCity) return false;
-
-      // Name search
       if (searchName.trim() && !lib.name.toLowerCase().includes(searchName.toLowerCase())) return false;
-
-      // Price filter
       if (priceRange !== "all") {
         const [min, max] = priceRange.split("-").map(Number);
         const pricing = lib.pricing as Record<string, number>;
         const price = pricing?.monthly ?? pricing?.daily ?? 0;
         if (price < min || price > max) return false;
       }
-
       return true;
     });
   }, [libraries, selectedCity, searchName, priceRange]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // filters are reactive, no extra action needed
   };
 
   return (
     <div className="min-h-screen">
-      {/* Full-page nebula background */}
       <div className="fixed inset-0 z-0">
         <HeroSlideshow />
       </div>
@@ -63,7 +56,6 @@ export default function Index() {
 
       {/* Hero */}
       <section className="relative overflow-hidden px-4 py-16 sm:py-24">
-
         <div className="container relative text-center z-10">
           <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-1.5 text-sm font-medium text-primary-foreground backdrop-blur-sm">
             <BookOpen className="h-4 w-4" />
@@ -76,13 +68,12 @@ export default function Index() {
             Browse top-rated study libraries, compare amenities & pricing, and book your seat instantly.
           </p>
 
-          {/* Airbnb-style search bar */}
+          {/* Search bar */}
           <form
             onSubmit={handleSearch}
             className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-2xl border border-border bg-card shadow-card-hover sm:rounded-full"
           >
             <div className="flex flex-col divide-y divide-border sm:flex-row sm:divide-x sm:divide-y-0">
-              {/* Location */}
               <div className="relative flex-1 min-w-0">
                 <label className="absolute left-4 top-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:left-6 sm:top-3 sm:text-[11px]">
                   Where
@@ -102,7 +93,6 @@ export default function Index() {
                 </div>
               </div>
 
-              {/* Search name */}
               <div className="relative flex-1 min-w-0">
                 <label className="absolute left-4 top-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:left-6 sm:top-3 sm:text-[11px]">
                   Search
@@ -119,7 +109,6 @@ export default function Index() {
                 </div>
               </div>
 
-              {/* Pricing */}
               <div className="relative flex items-center">
                 <div className="flex-1 min-w-0">
                   <label className="absolute left-4 top-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:left-6 sm:top-3 sm:text-[11px]">
@@ -157,12 +146,29 @@ export default function Index() {
           {selectedCity !== "all" ? `Libraries in ${selectedCity}` : "Available Libraries"}
         </h2>
         <p className="mt-1 text-muted-foreground">
-          {filtered.length} {filtered.length === 1 ? "library" : "libraries"} found
+          {isLoading ? "Loading..." : `${filtered.length} ${filtered.length === 1 ? "library" : "libraries"} found`}
         </p>
 
         {isLoading ? (
-          <div className="mt-16 flex justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-xl border bg-card p-4 space-y-3">
+                <Skeleton className="h-40 w-full rounded-lg" />
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="mt-16 text-center">
+            <p className="text-muted-foreground">Failed to load libraries.</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-3 text-sm font-medium text-primary hover:underline"
+            >
+              Try again
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="mt-16 text-center text-muted-foreground">
