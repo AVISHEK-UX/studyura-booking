@@ -63,7 +63,7 @@ export default function MyBookings() {
           </div>
           <Button variant="outline" size="sm" onClick={handleSignOut} className="gap-2">
             <LogOut className="h-4 w-4" />
-            Sign Out
+            Log Out
           </Button>
         </div>
 

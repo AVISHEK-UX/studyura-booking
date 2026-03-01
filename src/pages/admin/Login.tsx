@@ -52,7 +52,7 @@ export default function AdminLogin() {
             <BookOpen className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="mt-4 font-display text-2xl font-bold text-foreground">Admin Login</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Sign in to manage your libraries</p>
+          <p className="mt-1 text-sm text-muted-foreground">Log in to manage your libraries</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -84,7 +84,7 @@ export default function AdminLogin() {
           {hint && !error && <p className="text-sm text-muted-foreground animate-pulse">{hint}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign In
+            Log In
           </Button>
         </form>
       </div>
