@@ -5,59 +5,69 @@ import Header from "@/components/public/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { BookOpen, Loader2, ArrowLeft, Mail, ShieldCheck } from "lucide-react";
+import { BookOpen, Loader2, LogIn, UserPlus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Login() {
-  const [step, setStep] = useState<"email" | "otp">("email");
+  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { signInWithOtp, verifyOtp, user } = useAuth();
+  const { signIn, signUp, user } = useAuth();
 
   const redirectTo = searchParams.get("redirect") || "/";
 
-  // If already logged in, redirect
   if (user) {
     navigate(redirectTo, { replace: true });
     return null;
   }
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess("");
 
-    const { error } = await signInWithOtp(email);
-    if (error) {
-      setError(error);
-    } else {
-      setSuccess("OTP sent to your email. Check your inbox.");
-      setStep("otp");
-    }
-    setLoading(false);
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length < 6) {
-      setError("Please enter the 6-digit OTP");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
       return;
     }
-    setLoading(true);
-    setError("");
 
-    const { error } = await verifyOtp(email, otp);
-    if (error) {
-      setError(error);
-      setLoading(false);
+    if (mode === "signup" && password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+
+    if (mode === "login") {
+      const { error: err } = await signIn(email, password);
+      if (err) {
+        setError(err);
+        setLoading(false);
+      } else {
+        navigate(redirectTo, { replace: true });
+      }
     } else {
-      navigate(redirectTo, { replace: true });
+      const { error: err } = await signUp(email, password);
+      if (err) {
+        setError(err);
+        setLoading(false);
+      } else {
+        // Auto-confirm is on, so sign in immediately
+        const { error: signInErr } = await signIn(email, password);
+        if (signInErr) {
+          setSuccess("Account created! Please log in.");
+          setMode("login");
+          setLoading(false);
+        } else {
+          navigate(redirectTo, { replace: true });
+        }
+      }
     }
   };
 
@@ -72,72 +82,98 @@ export default function Login() {
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground">Welcome to StudyUra</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              {step === "email"
-                ? "Enter your email to receive a one-time password."
-                : `We sent a 6-digit code to ${email}`}
+              {mode === "login"
+                ? "Log in to your account to continue."
+                : "Create an account to get started."}
             </p>
           </div>
 
-          {success && step === "otp" && (
+          {/* Tab toggle */}
+          <div className="flex rounded-lg bg-muted p-1">
+            <button
+              type="button"
+              onClick={() => { setMode("login"); setError(""); setSuccess(""); }}
+              className={cn(
+                "flex-1 rounded-md py-2.5 text-sm font-medium transition-all",
+                mode === "login"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Log In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode("signup"); setError(""); setSuccess(""); }}
+              className={cn(
+                "flex-1 rounded-md py-2.5 text-sm font-medium transition-all",
+                mode === "signup"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Create Account
+            </button>
+          </div>
+
+          {success && (
             <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-center text-sm text-primary">
               {success}
             </div>
           )}
 
-          {step === "email" ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {mode === "signup" && (
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="confirm-password">Confirm Password</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
               </div>
+            )}
 
-              {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
 
-              <Button type="submit" className="w-full gap-2" disabled={loading}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                Send OTP
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="flex flex-col items-center gap-2">
-                <Label>Enter OTP</Label>
-                <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-
-              {error && <p className="text-sm text-center text-destructive">{error}</p>}
-
-              <Button type="submit" className="w-full gap-2" disabled={loading}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
-                Verify & Log In
-              </Button>
-
-              <button
-                type="button"
-                onClick={() => { setStep("email"); setOtp(""); setError(""); }}
-                className="flex w-full items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Change email
-              </button>
-            </form>
-          )}
+            <Button type="submit" className="w-full gap-2" disabled={loading}>
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : mode === "login" ? (
+                <LogIn className="h-4 w-4" />
+              ) : (
+                <UserPlus className="h-4 w-4" />
+              )}
+              {mode === "login" ? "Log In" : "Create Account"}
+            </Button>
+          </form>
         </div>
       </div>
     </div>
