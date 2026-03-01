@@ -7,7 +7,7 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null; isAdmin: boolean }>;
-  signUp: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: string | null }>;
   signInWithOtp: (email: string) => Promise<{ error: string | null }>;
   verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -78,8 +78,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
+  const signUp = async (email: string, password: string, fullName?: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: fullName ? { data: { full_name: fullName } } : undefined,
+    });
     return { error: error?.message ?? null };
   };
 
