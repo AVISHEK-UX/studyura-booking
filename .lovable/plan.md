@@ -1,37 +1,35 @@
 
 
-## Add Location-Based Library Filtering
+## Integrate Modern Animated Footer
 
-Use the browser's Geolocation API to detect the user's city and automatically filter libraries to their location -- similar to the OYO-style location prompt in the screenshot.
+Add a branded footer component to the Index page, replacing the current simple footer. Adapted from the provided Next.js component to work with React Router and the studyura brand.
 
 ### What Changes
 
-**1. Create `src/components/public/LocationPrompt.tsx`**
-- A modal/dialog that appears on first visit asking "Allow studyura to access your location?"
-- Shows a location pin icon and two buttons: "Allow Location" and "Skip"
-- Styled with the green theme, rounded card, clean layout (inspired by the OYO screenshot)
-- Uses `navigator.geolocation.getCurrentPosition()` to get lat/lng
-- Reverse geocodes coordinates to a city name using a free API (Nominatim/OpenStreetMap -- no API key needed)
-- Stores the user's choice in localStorage so the prompt only shows once per device
+**1. Copy uploaded logo to `src/assets/logo-2.png`**
+- The user uploaded a new green hexagonal "S" logo that will be used in the footer's bottom logo section.
 
-**2. Create `src/hooks/useUserLocation.ts`**
-- Custom hook that manages location state (city name, loading, error)
-- Checks localStorage for a previously detected city
-- Exposes `requestLocation()` to trigger the geolocation flow
-- Returns `{ city, loading, requestLocation, clearLocation }`
+**2. Create `src/components/ui/modem-animated-footer.tsx`**
+- Port the provided Next.js footer component to React Router (replace `next/link` with `react-router-dom` `Link`)
+- Remove the `next` dependency entirely -- it's not needed
+- Keep all Tailwind styling, animations, and layout structure
+- Uses `lucide-react` icons (already installed)
+- The component accepts props for brand name, description, social links, nav links, and brand icon
 
 **3. Update `src/pages/Index.tsx`**
-- Import and use the `useUserLocation` hook
-- Show the `LocationPrompt` dialog if no location has been set yet
-- Auto-set the city filter (`selectedCity`) when location is detected
-- Add a small "Near me" chip/button next to the location dropdown so users can re-trigger location detection
+- Replace the current simple `<footer>` block (lines 249-254) with the new `Footer` component
+- Configure it with studyura branding:
+  - Brand name: "studyura"
+  - Brand description: "Find your perfect study space."
+  - Social links: Customer care phone (8881189088) and email (studyura.helpdesk@gmail.com) only -- no social media
+  - Nav links: relevant app pages (e.g., Home, My Bookings, Login)
+  - Brand icon: the uploaded studyura logo (`logo-2.png`)
 
 ### Technical Details
 
-- Reverse geocoding via `https://nominatim.openstreetmap.org/reverse?lat=...&lon=...&format=json` (free, no key)
-- The detected city is matched against available library cities (case-insensitive); if no match, show all libraries with a note
-- localStorage key: `studyura_user_city`
-- No database changes needed -- libraries already have a `city` column
-- The prompt only appears once; users can change location anytime via the "Where" dropdown
-- Graceful fallback: if user denies permission or geocoding fails, just show all libraries
+- **No new npm dependencies** -- `next` is NOT installed; the component is converted to use `react-router-dom` `Link` (already installed) and standard `<a>` tags for external links
+- `lucide-react` is already installed -- uses `Phone` and `Mail` icons for customer support links
+- The large background text watermark will display "STUDYURA"
+- The footer's dark theme (zinc/neutral backgrounds) will contrast with the main page, creating a clear visual separation
+- The component uses `cn()` from `@/lib/utils` for class merging (already available)
 
