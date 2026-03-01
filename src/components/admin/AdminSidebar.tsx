@@ -77,7 +77,7 @@ export default function AdminSidebar() {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sidebar-primary">
             <BookOpen className="h-3.5 w-3.5 text-sidebar-primary-foreground" />
           </div>
-          <span className="font-display text-base font-bold text-sidebar-foreground">StudySpot</span>
+          <span className="font-display text-base font-bold text-sidebar-foreground">StudyUra</span>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdminSidebar() {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-sidebar-primary">
             <BookOpen className="h-3.5 w-3.5 text-sidebar-primary-foreground" />
           </div>
-          <span className="font-display text-base font-bold">StudySpot</span>
+          <span className="font-display text-base font-bold">StudyUra</span>
           <Button variant="ghost" size="icon" className="ml-auto text-sidebar-foreground" onClick={() => setOpen(false)}>
             <X className="h-5 w-5" />
           </Button>
@@ -110,7 +110,7 @@ export default function AdminSidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
             <BookOpen className="h-4 w-4 text-sidebar-primary-foreground" />
           </div>
-          <span className="font-display text-lg font-bold">StudySpot</span>
+          <span className="font-display text-lg font-bold">StudyUra</span>
         </div>
         {navContent}
       </aside>

@@ -189,7 +189,7 @@ export default function Index() {
       {/* Footer */}
       <footer className="border-t border-primary-foreground/10 py-8">
         <div className="container text-center text-sm text-primary-foreground/60">
-          © {new Date().getFullYear()} StudySpot. Find your perfect study space.
+          © {new Date().getFullYear()} StudyUra. Find your perfect study space.
         </div>
       </footer>
       </div>
