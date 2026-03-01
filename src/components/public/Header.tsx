@@ -83,7 +83,7 @@ export default function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-white/30 backdrop-blur-xl backdrop-saturate-150 shadow-sm transition-all duration-300">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="studyura logo" className="h-8 w-8 rounded-lg object-contain" />
