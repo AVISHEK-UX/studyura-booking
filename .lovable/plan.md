@@ -1,47 +1,31 @@
 
 
-## Three Fixes: Navbar, Auto-fill Booking, Session Persistence
+## Fix: Show User Email, Ensure Booking ID Visibility, Fix RLS
 
-### 1. Desktop Navbar -- Keep Full-Width (No Pill Morph)
+### Issues Identified
 
-**File: `src/components/public/Header.tsx`**
+1. **RLS policies on bookings are still RESTRICTIVE** -- both "Users can read own bookings" and "Admins can read all bookings" have `Permissive: No`, meaning a user must satisfy BOTH conditions simultaneously (be the owner AND be admin) to see bookings. This is why My Bookings may intermittently fail.
+2. **User email is not stored in bookings** -- the `bookings` table has no email column, so it can't be displayed anywhere.
+3. **Booking ID generation already works** -- the `verify-razorpay-payment` edge function generates a unique `STU-{CODE}-{YYMMDD}-{RANDOM6}` booking ID on successful payment. This just needs to be visible in both user and admin views.
 
-The scroll-based pill morphing will only apply on mobile (below `md` breakpoint). On desktop (`md` and above), the navbar stays full-width with the `bg-[#e8e8e8]` background at all times.
+### Changes
 
-- Use `useIsMobile()` hook (already exists at `src/hooks/use-mobile.tsx`) to detect screen size
-- Only apply the pill/rounded styling when `isScrolled && isMobile`
-- Desktop always gets the full-width rectangular navbar with consistent height
+**1. Database Migration**
+- Add `customer_email` column (text, nullable) to the `bookings` table
+- Drop the two restrictive SELECT policies and recreate them as PERMISSIVE so users can see their own bookings OR admins can see all bookings
 
-### 2. Auto-Fill Booking Form for Returning Users
+**2. `src/components/public/PaymentForm.tsx`**
+- Store `user.email` as `customer_email` when inserting the draft booking
 
-**File: `src/components/public/PaymentForm.tsx`**
+**3. `src/components/public/BookingForm.tsx`**
+- Store `user.email` as `customer_email` when inserting a booking (WhatsApp-only flow)
 
-When a logged-in user opens the booking form, auto-populate the name and phone fields from their most recent booking.
+**4. `src/pages/MyBookings.tsx`**
+- Already shows `user?.email` in the header -- no change needed there
+- Booking cards already show `booking_id` -- confirmed working
 
-- Add a `useEffect` that runs when the component mounts (and `user` is present)
-- Query the `bookings` table for the user's latest booking: `select customer_name, customer_phone from bookings where user_id = ? order by created_at desc limit 1`
-- If found, call `setValue("name", ...)` and `setValue("phone", ...)` to pre-fill the form
-- Also fall back to `user.user_metadata.full_name` for the name field if no prior booking exists
-
-### 3. Session Persistence Across Refresh
-
-**File: `src/hooks/useAuth.tsx`**
-
-The current auth implementation already uses `supabase.auth.getSession()` on mount and `onAuthStateChange` listener, which should persist sessions across refreshes (Supabase stores tokens in localStorage by default). 
-
-However, a potential issue is that the `loading` state might cause a brief flash that looks like a logout. The fix:
-
-- Ensure `loading` stays `true` until the session is fully restored
-- Verify that `onAuthStateChange` with `TOKEN_REFRESHED` events properly maintains the user state
-- Add a check: if `getSession` returns a session, trust it immediately without waiting for the auth state change event
-
-This should already be working correctly based on the code, but we will add defensive checks to ensure no race condition causes a momentary logged-out state on refresh.
-
-### Technical Summary
-
-| Change | File | What |
-|--------|------|------|
-| Desktop navbar stays full-width | `Header.tsx` | Use `useIsMobile()` to gate pill morph |
-| Auto-fill booking details | `PaymentForm.tsx` | Query last booking on mount, pre-fill name/phone |
-| Session persists on refresh | `useAuth.tsx` | Defensive loading state, no premature user=null |
+**5. `src/pages/admin/LibraryBookings.tsx`**
+- Add `customer_email` to the Booking type
+- Add an "Email" column to the admin bookings table
+- Show email in the booking detail drawer
 
