@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BookOpen, User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X } from "lucide-react";
+import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -85,9 +86,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <BookOpen className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img src={logo} alt="StudyUra logo" className="h-9 w-9 rounded-lg object-contain" />
           <span className="font-display text-xl font-bold text-foreground">StudyUra</span>
         </Link>
 
