@@ -6,6 +6,14 @@ import PaymentForm from "@/components/public/PaymentForm";
 import { ArrowLeft, MapPin, Navigation, IndianRupee, Clock, Wifi, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface Discount {
+  active: boolean;
+  type: "PERCENT" | "FLAT";
+  value: number;
+  validFrom?: string;
+  validTo?: string;
+}
+
 export default function LibraryDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: library, isLoading } = useLibrary(id!);
@@ -37,6 +45,7 @@ export default function LibraryDetail() {
 
   const pricing = library.pricing as Record<string, number>;
   const shifts = (library.shifts as string[]) ?? [];
+  const discount = (library as any).discount as Discount | null;
 
   return (
     <div className="min-h-screen">
@@ -143,6 +152,7 @@ export default function LibraryDetail() {
                   libraryWhatsapp={(library as any).whatsapp_number || ""}
                   shifts={shifts}
                   pricing={pricing}
+                  discount={discount}
                 />
               </div>
             </div>

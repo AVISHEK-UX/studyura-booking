@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { CheckCircle2, Loader2, IndianRupee, Printer, MessageCircle, Copy } from "lucide-react";
+import { CheckCircle2, Loader2, IndianRupee, Printer, MessageCircle, Copy, LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -19,7 +20,6 @@ declare global {
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
-  email: z.string().trim().email("Valid email is required").max(255),
   phone: z.string().trim().min(10, "Valid phone number required").max(15),
   shift: z.string().min(1, "Shift is required"),
   plan: z.string().min(1, "Plan is required"),
@@ -27,12 +27,21 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+interface Discount {
+  active: boolean;
+  type: "PERCENT" | "FLAT";
+  value: number;
+  validFrom?: string;
+  validTo?: string;
+}
+
 interface PaymentFormProps {
   libraryId: string;
   libraryName: string;
   libraryWhatsapp: string;
   shifts: string[];
   pricing: Record<string, number>;
+  discount?: Discount | null;
 }
 
 interface ReceiptData {
@@ -43,7 +52,9 @@ interface ReceiptData {
   library: string;
   shift: string;
   plan: string;
-  amount: number;
+  baseAmount: number;
+  discountLabel: string;
+  finalAmount: number;
   paymentId: string;
   date: string;
   whatsappUrl: string;
@@ -58,6 +69,27 @@ function loadRazorpayScript(): Promise<boolean> {
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
+}
+
+function isDiscountActive(d?: Discount | null): boolean {
+  if (!d || !d.active) return false;
+  const now = new Date();
+  if (d.validFrom && new Date(d.validFrom) > now) return false;
+  if (d.validTo && new Date(d.validTo) < now) return false;
+  return true;
+}
+
+function calcDiscount(baseAmount: number, d: Discount): { finalAmount: number; amountOff: number; label: string } {
+  let amountOff = 0;
+  let label = "";
+  if (d.type === "PERCENT") {
+    amountOff = Math.round(baseAmount * d.value / 100);
+    label = `${d.value}% off`;
+  } else {
+    amountOff = Math.min(d.value, baseAmount);
+    label = `₹${d.value} off`;
+  }
+  return { finalAmount: Math.max(baseAmount - amountOff, 0), amountOff, label };
 }
 
 function buildWhatsAppMessage(data: {
@@ -83,8 +115,9 @@ function buildWhatsAppUrl(whatsappNumber: string, message: string) {
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
-export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, shifts, pricing }: PaymentFormProps) {
+export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, shifts, pricing, discount }: PaymentFormProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const {
     register, handleSubmit, setValue, watch,
     formState: { errors },
@@ -99,7 +132,31 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
 
   const currentPlan = watch("plan");
   const pricingEntries = Object.entries(pricing);
-  const selectedAmount = currentPlan && pricing[currentPlan] !== undefined ? pricing[currentPlan] : 0;
+  const baseAmount = currentPlan && pricing[currentPlan] !== undefined ? pricing[currentPlan] : 0;
+
+  const discountActive = isDiscountActive(discount);
+  const discountInfo = discountActive && baseAmount > 0 ? calcDiscount(baseAmount, discount!) : null;
+  const finalAmount = discountInfo ? discountInfo.finalAmount : baseAmount;
+
+  // If not logged in, show login prompt
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center gap-4 py-6 text-center">
+        <LogIn className="h-10 w-10 text-primary" />
+        <h3 className="font-display text-lg font-semibold text-foreground">Log in to Book</h3>
+        <p className="text-sm text-muted-foreground">
+          Please log in to book this library.
+        </p>
+        <Button
+          className="w-full gap-2"
+          onClick={() => navigate(`/login?redirect=/library/${libraryId}`)}
+        >
+          <LogIn className="h-4 w-4" />
+          Log In to Continue
+        </Button>
+      </div>
+    );
+  }
 
   const handlePrint = () => {
     if (!receiptRef.current || !receipt) return;
@@ -117,6 +174,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         .total { font-size: 18px; border-top: 2px solid #2d8a6e; margin-top: 12px; padding-top: 12px; }
         .footer { text-align: center; margin-top: 24px; font-size: 12px; color: #999; }
         .badge { display: inline-block; background: #e6f7f0; color: #2d8a6e; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px; }
+        .discount { color: #c0392b; font-size: 13px; }
       </style></head><body>
         <div class="header"><h1>StudyUra</h1><p>Payment Receipt</p><span class="badge">✓ Payment Successful</span></div>
         <div class="row"><span class="label">Booking ID</span><span class="value">${receipt.bookingId}</span></div>
@@ -128,7 +186,8 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         <div class="row"><span class="label">Library</span><span class="value">${receipt.library}</span></div>
         <div class="row"><span class="label">Shift</span><span class="value">${receipt.shift}</span></div>
         <div class="row"><span class="label">Plan</span><span class="value">${receipt.plan}</span></div>
-        <div class="row total"><span class="label">Amount Paid</span><span class="value">₹${receipt.amount}</span></div>
+        ${receipt.discountLabel ? `<div class="row discount"><span class="label">Discount</span><span class="value">${receipt.discountLabel}</span></div>` : ""}
+        <div class="row total"><span class="label">Amount Paid</span><span class="value">₹${receipt.finalAmount}</span></div>
         <div class="footer">Thank you for choosing StudyUra!<br/>This is a computer-generated receipt.</div>
       </body></html>
     `);
@@ -142,7 +201,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
       bookingId: receipt.bookingId, libraryName: receipt.library,
       bookingDate: receipt.date, shift: receipt.shift,
       userName: receipt.name, userPhone: receipt.phone,
-      amount: receipt.amount, paymentId: receipt.paymentId,
+      amount: receipt.finalAmount, paymentId: receipt.paymentId,
     });
     navigator.clipboard.writeText(msg);
     toast.success("Message copied to clipboard!");
@@ -153,9 +212,18 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
     setPaymentError("");
 
     try {
-      const amount = pricing[data.plan];
-      if (!amount || amount <= 0) {
+      const base = pricing[data.plan];
+      if (!base || base <= 0) {
         setPaymentError("No pricing available for this plan.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      const disc = isDiscountActive(discount) ? calcDiscount(base, discount!) : null;
+      const payableAmount = disc ? disc.finalAmount : base;
+
+      if (payableAmount <= 0) {
+        setPaymentError("Invalid final amount.");
         setIsSubmitting(false);
         return;
       }
@@ -169,6 +237,8 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
 
       // Step 1: Create draft booking (PENDING_PAYMENT)
       const draftId = crypto.randomUUID();
+      const discountApplied = disc ? { type: discount!.type, value: discount!.value, amount_off: disc.amountOff } : null;
+
       const { error: draftErr } = await supabase.from("bookings").insert({
         id: draftId,
         library_name: libraryName,
@@ -177,8 +247,11 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         customer_phone: data.phone,
         preferred_date: new Date().toISOString().split("T")[0],
         preferred_shift: data.shift,
-        user_id: user?.id ?? null,
-        amount,
+        user_id: user.id,
+        amount: payableAmount,
+        base_amount: base,
+        discount_applied: discountApplied,
+        final_amount: payableAmount,
         plan: data.plan,
         status: "PENDING_PAYMENT",
       });
@@ -190,7 +263,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         "create-razorpay-order",
         {
           body: {
-            amount, currency: "INR",
+            amount: payableAmount, currency: "INR",
             receipt: `booking_${draftId}`,
             notes: { library: libraryName, shift: data.shift, plan: data.plan, customer_name: data.name },
           },
@@ -198,12 +271,12 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
       );
 
       if (orderError || !orderData?.order_id) {
-        // Mark draft as cancelled
         await supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftId);
         throw new Error(orderError?.message || "Failed to create payment order");
       }
 
       // Step 3: Open Razorpay checkout
+      const userEmail = user.email || "";
       const options = {
         key: orderData.key_id,
         amount: orderData.amount,
@@ -211,12 +284,11 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         name: "StudyUra",
         description: `${libraryName} — ${data.shift} (${data.plan})`,
         order_id: orderData.order_id,
-        prefill: { name: data.name, email: data.email, contact: data.phone },
+        prefill: { name: data.name, email: userEmail, contact: data.phone },
         notes: { library: libraryName, shift: data.shift, plan: data.plan },
         theme: { color: "#2d8a6e" },
         handler: async (response: any) => {
           try {
-            // Step 4: Verify payment server-side
             const { data: verifyData, error: verifyErr } = await supabase.functions.invoke(
               "verify-razorpay-payment",
               {
@@ -243,7 +315,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
             const whatsappMsg = buildWhatsAppMessage({
               bookingId, libraryName, bookingDate: todayStr,
               shift: data.shift, userName: data.name, userPhone: data.phone,
-              amount, paymentId: response.razorpay_payment_id || "N/A",
+              amount: payableAmount, paymentId: response.razorpay_payment_id || "N/A",
             });
 
             const whatsappUrl = libraryWhatsapp
@@ -251,13 +323,14 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
               : "";
 
             setReceipt({
-              bookingId, name: data.name, email: data.email, phone: data.phone,
-              library: libraryName, shift: data.shift, plan: data.plan, amount,
+              bookingId, name: data.name, email: userEmail, phone: data.phone,
+              library: libraryName, shift: data.shift, plan: data.plan,
+              baseAmount: base, discountLabel: disc ? disc.label : "",
+              finalAmount: payableAmount,
               paymentId: response.razorpay_payment_id || "N/A", date: todayStr,
               whatsappUrl,
             });
 
-            // Auto-redirect to WhatsApp after 2 seconds
             if (whatsappUrl) {
               setTimeout(() => window.open(whatsappUrl, "_blank"), 2000);
             }
@@ -269,7 +342,6 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         },
         modal: {
           ondismiss: () => {
-            // User closed Razorpay — mark draft cancelled
             supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", draftId);
             setIsSubmitting(false);
           },
@@ -325,10 +397,24 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
             <span className="text-muted-foreground">Plan</span>
             <span className="font-medium capitalize text-foreground">{receipt.plan}</span>
           </div>
+          {receipt.discountLabel && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Base Amount</span>
+                <div className="flex items-center gap-0.5 font-medium text-foreground">
+                  <IndianRupee className="h-3.5 w-3.5" />{receipt.baseAmount}
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Discount</span>
+                <span className="font-medium text-primary">{receipt.discountLabel}</span>
+              </div>
+            </>
+          )}
           <div className="flex justify-between border-t pt-2">
             <span className="font-semibold text-foreground">Amount Paid</span>
             <div className="flex items-center gap-0.5 text-lg font-bold text-primary">
-              <IndianRupee className="h-4 w-4" />{receipt.amount}
+              <IndianRupee className="h-4 w-4" />{receipt.finalAmount}
             </div>
           </div>
         </div>
@@ -361,12 +447,6 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         <Label htmlFor="name">Your Name *</Label>
         <Input id="name" {...register("name")} placeholder="Enter your name" className="mt-1" />
         {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>}
-      </div>
-
-      <div>
-        <Label htmlFor="email">Email *</Label>
-        <Input id="email" type="email" {...register("email")} placeholder="you@example.com" className="mt-1" />
-        {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <div>
@@ -403,20 +483,41 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         </div>
       )}
 
-      {selectedAmount > 0 && (
-        <div className="flex items-center justify-between rounded-lg border bg-secondary/50 p-3">
-          <span className="text-sm font-medium text-muted-foreground">Amount to Pay</span>
-          <div className="flex items-center gap-0.5 text-lg font-bold text-foreground">
-            <IndianRupee className="h-4 w-4" />{selectedAmount}
-          </div>
+      {baseAmount > 0 && (
+        <div className="space-y-2 rounded-lg border bg-secondary/50 p-3">
+          {discountInfo ? (
+            <>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Base Price</span>
+                <span className="text-foreground line-through">₹{baseAmount}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Discount</span>
+                <span className="font-medium text-primary">{discountInfo.label} (−₹{discountInfo.amountOff})</span>
+              </div>
+              <div className="flex items-center justify-between border-t pt-2">
+                <span className="text-sm font-medium text-foreground">Amount to Pay</span>
+                <div className="flex items-center gap-0.5 text-lg font-bold text-foreground">
+                  <IndianRupee className="h-4 w-4" />{finalAmount}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-muted-foreground">Amount to Pay</span>
+              <div className="flex items-center gap-0.5 text-lg font-bold text-foreground">
+                <IndianRupee className="h-4 w-4" />{baseAmount}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       {paymentError && <p className="text-sm text-destructive">{paymentError}</p>}
 
-      <Button type="submit" className="w-full gap-2" disabled={isSubmitting || selectedAmount <= 0}>
+      <Button type="submit" className="w-full gap-2" disabled={isSubmitting || finalAmount <= 0}>
         {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-        {selectedAmount > 0 ? `Pay ₹${selectedAmount}` : "Select shift & plan"}
+        {finalAmount > 0 ? `Pay ₹${finalAmount}` : "Select shift & plan"}
       </Button>
     </form>
   );

@@ -15,6 +15,7 @@ import AdminGuard from "./components/admin/AdminGuard";
 import LibraryEdit from "./pages/admin/LibraryEdit";
 import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
+import LibraryDiscounts from "./pages/admin/LibraryDiscounts";
 import NotFound from "./pages/NotFound";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="library/new" element={<LibraryEdit />} />
               <Route path="library/:id/edit" element={<LibraryEdit />} />
               <Route path="library-bookings" element={<LibraryBookings />} />
+              <Route path="library-discounts" element={<LibraryDiscounts />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="*" element={<NotFound />} />

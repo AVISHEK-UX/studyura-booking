@@ -38,10 +38,13 @@ export type Database = {
       bookings: {
         Row: {
           amount: number | null
+          base_amount: number | null
           booking_id: string | null
           created_at: string
           customer_name: string
           customer_phone: string | null
+          discount_applied: Json | null
+          final_amount: number | null
           id: string
           library_id: string | null
           library_name: string
@@ -56,10 +59,13 @@ export type Database = {
         }
         Insert: {
           amount?: number | null
+          base_amount?: number | null
           booking_id?: string | null
           created_at?: string
           customer_name: string
           customer_phone?: string | null
+          discount_applied?: Json | null
+          final_amount?: number | null
           id?: string
           library_id?: string | null
           library_name: string
@@ -74,10 +80,13 @@ export type Database = {
         }
         Update: {
           amount?: number | null
+          base_amount?: number | null
           booking_id?: string | null
           created_at?: string
           customer_name?: string
           customer_phone?: string | null
+          discount_applied?: Json | null
+          final_amount?: number | null
           id?: string
           library_id?: string | null
           library_name?: string
@@ -106,6 +115,7 @@ export type Database = {
           amenities: string[] | null
           city: string | null
           created_at: string
+          discount: Json | null
           google_maps_url: string | null
           id: string
           is_active: boolean
@@ -123,6 +133,7 @@ export type Database = {
           amenities?: string[] | null
           city?: string | null
           created_at?: string
+          discount?: Json | null
           google_maps_url?: string | null
           id?: string
           is_active?: boolean
@@ -140,6 +151,7 @@ export type Database = {
           amenities?: string[] | null
           city?: string | null
           created_at?: string
+          discount?: Json | null
           google_maps_url?: string | null
           id?: string
           is_active?: boolean

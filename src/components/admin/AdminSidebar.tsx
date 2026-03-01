@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpen, LayoutDashboard, Plus, Settings, LogOut, CalendarCheck, Menu, X, Home } from "lucide-react";
+import { BookOpen, LayoutDashboard, Plus, Settings, LogOut, CalendarCheck, Menu, X, Home, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 
@@ -17,6 +17,7 @@ export default function AdminSidebar() {
   const links = [
     { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/library-bookings", label: "Bookings", icon: CalendarCheck },
+    { to: "/admin/library-discounts", label: "Discounts", icon: Tag },
     { to: "/admin/library/new", label: "Add Library", icon: Plus },
     { to: "/admin/settings", label: "Settings", icon: Settings },
   ];
