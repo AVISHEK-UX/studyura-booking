@@ -7,6 +7,7 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithOtp: (email: string) => Promise<{ error: string | null }>;
   verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   loading: true,
   signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
   signInWithOtp: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
   signOut: async () => {},
@@ -64,6 +66,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error: error?.message ?? null };
   };
 
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({ email, password });
+    return { error: error?.message ?? null };
+  };
+
   const signInWithOtp = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -88,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signInWithOtp, verifyOtp, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signUp, signInWithOtp, verifyOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
