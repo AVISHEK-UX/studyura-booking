@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -129,6 +129,27 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [paymentError, setPaymentError] = useState("");
   const receiptRef = useRef<HTMLDivElement>(null);
+
+  // Auto-fill name & phone from last booking or user metadata
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("bookings")
+        .select("customer_name, customer_phone")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (data) {
+        if (data.customer_name) setValue("name", data.customer_name);
+        if (data.customer_phone) setValue("phone", data.customer_phone);
+      } else {
+        const fullName = user.user_metadata?.full_name;
+        if (fullName) setValue("name", fullName);
+      }
+    })();
+  }, [user, setValue]);
 
   const currentPlan = watch("plan");
   const pricingEntries = Object.entries(pricing);

@@ -3,6 +3,7 @@ import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X } from 
 import logo from "@/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY >= 60);
@@ -93,12 +95,12 @@ export default function Header() {
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 ease-in-out motion-reduce:transition-none"
-        style={{ padding: isScrolled ? '8px 16px 0' : '0' }}
+        style={{ padding: isScrolled && isMobile ? '8px 16px 0' : '0' }}
       >
         <header
           className={[
             "w-full transition-all duration-300 ease-in-out motion-reduce:transition-none",
-            isScrolled
+            isScrolled && isMobile
               ? "max-w-[900px] rounded-full bg-white/95 backdrop-blur-xl shadow-lg border border-border/40"
               : "bg-[#e8e8e8] border-b border-border/20",
           ].join(" ")}
@@ -106,11 +108,11 @@ export default function Header() {
           <div
             className={[
               "flex items-center justify-between transition-all duration-300 ease-in-out px-6",
-              isScrolled ? "h-14" : "h-16",
+              isScrolled && isMobile ? "h-14" : "h-16",
             ].join(" ")}
           >
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="studyura logo" className={`rounded-lg object-contain transition-all duration-300 ${isScrolled ? 'h-7 w-7' : 'h-8 w-8'}`} />
+              <img src={logo} alt="studyura logo" className={`rounded-lg object-contain transition-all duration-300 ${isScrolled && isMobile ? 'h-7 w-7' : 'h-8 w-8'}`} />
               <span className="font-display text-lg font-bold text-foreground">studyura</span>
             </Link>
 
@@ -133,7 +135,7 @@ export default function Header() {
           {mobileOpen && (
             <nav className={[
               "md:hidden border-t border-border bg-card/95 backdrop-blur-md px-4 py-3 flex flex-col gap-3 animate-fade-in",
-              isScrolled ? "rounded-b-3xl" : "",
+              isScrolled && isMobile ? "rounded-b-3xl" : "",
             ].join(" ")}>
               {navLinks}
             </nav>
