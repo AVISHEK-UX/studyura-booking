@@ -1,8 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLibraries } from "@/hooks/useLibraries";
+import { useUserLocation } from "@/hooks/useUserLocation";
 import Header from "@/components/public/Header";
 import LibraryCard from "@/components/public/LibraryCard";
-import { BookOpen, MapPin, Search, IndianRupee } from "lucide-react";
+import LocationPrompt from "@/components/public/LocationPrompt";
+import { BookOpen, MapPin, Search, IndianRupee, Navigation } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeroSlideshow from "@/components/public/HeroSlideshow";
 
@@ -16,15 +18,34 @@ const PRICE_RANGES = [
 
 export default function Index() {
   const { data: libraries, isLoading, error, refetch } = useLibraries();
+  const { city: detectedCity, loading: locationLoading, prompted, requestLocation, setPrompted } = useUserLocation();
   const [selectedCity, setSelectedCity] = useState("all");
   const [searchName, setSearchName] = useState("");
   const [priceRange, setPriceRange] = useState("all");
+  const [showLocationPrompt, setShowLocationPrompt] = useState(false);
 
   const cities = useMemo(() => {
     if (!libraries) return [];
     const unique = [...new Set(libraries.map((l) => l.city).filter(Boolean))] as string[];
     return unique.sort();
   }, [libraries]);
+
+  // Show location prompt on first visit (after libraries load)
+  useEffect(() => {
+    if (!prompted && !isLoading) {
+      setShowLocationPrompt(true);
+    }
+  }, [prompted, isLoading]);
+
+  // Auto-set city filter when location is detected
+  useEffect(() => {
+    if (detectedCity && cities.length > 0) {
+      const match = cities.find(
+        (c) => c.toLowerCase() === detectedCity.toLowerCase()
+      );
+      if (match) setSelectedCity(match);
+    }
+  }, [detectedCity, cities]);
 
   const filtered = useMemo(() => {
     if (!libraries) return [];
@@ -45,8 +66,32 @@ export default function Index() {
     e.preventDefault();
   };
 
+  const handleAllowLocation = async () => {
+    await requestLocation();
+    setShowLocationPrompt(false);
+  };
+
+  const handleSkipLocation = () => {
+    setPrompted();
+    setShowLocationPrompt(false);
+  };
+
+  const handleNearMe = async () => {
+    const city = await requestLocation();
+    if (city && cities.length > 0) {
+      const match = cities.find((c) => c.toLowerCase() === city.toLowerCase());
+      if (match) setSelectedCity(match);
+    }
+  };
+
   return (
     <div className="min-h-screen">
+      <LocationPrompt
+        open={showLocationPrompt}
+        loading={locationLoading}
+        onAllow={handleAllowLocation}
+        onSkip={handleSkipLocation}
+      />
       <div className="fixed inset-0 z-0">
         <HeroSlideshow />
       </div>
@@ -75,9 +120,11 @@ export default function Index() {
           >
             <div className="flex flex-col divide-y divide-border sm:flex-row sm:divide-x sm:divide-y-0">
               <div className="relative flex-1 min-w-0">
-                <label className="absolute left-4 top-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:left-6 sm:top-3 sm:text-[11px]">
-                  Where
-                </label>
+                <div className="flex items-center gap-1">
+                  <label className="absolute left-4 top-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:left-6 sm:top-3 sm:text-[11px]">
+                    Where
+                  </label>
+                </div>
                 <div className="relative">
                   <MapPin className="pointer-events-none absolute left-4 bottom-2.5 h-4 w-4 text-muted-foreground sm:left-6 sm:bottom-4" />
                   <select
@@ -136,6 +183,19 @@ export default function Index() {
               </div>
             </div>
           </form>
+
+          {/* Near me chip */}
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={handleNearMe}
+              disabled={locationLoading}
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 px-4 py-1.5 text-sm font-medium text-primary-foreground backdrop-blur-sm transition-colors hover:bg-primary/30"
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              {locationLoading ? "Detecting..." : "Near me"}
+            </button>
+          </div>
         </div>
       </section>
 
