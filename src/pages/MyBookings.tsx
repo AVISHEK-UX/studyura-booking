@@ -132,6 +132,11 @@ function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean 
         )}
       </div>
       <div className="mt-3 space-y-1.5 text-sm">
+        {booking.booking_id && (
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
+            <span className="font-mono">{booking.booking_id}</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 text-muted-foreground">
           <Calendar className="h-3.5 w-3.5" />
           {new Date(booking.preferred_date).toLocaleDateString("en-IN", {
