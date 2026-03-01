@@ -1,41 +1,23 @@
 
 
-## Problem
+## Show Logged-In User Name in Header
 
-The admin login redirect fails due to a **double-firing race condition**:
+### What Changes
 
-1. `signIn()` calls `checkAdmin()` and returns `isAdmin: true`
-2. Admin login page calls `navigate("/admin/dashboard")`
-3. **Simultaneously**, `onAuthStateChange` fires from the sign-in event, which sets `loading = true` and starts **another** async `checkAdmin()` call
-4. During this second check, `AdminGuard` may briefly see `loading = false` + `isAdmin = false` and redirect to `/`
+**Header (`src/components/public/Header.tsx`)**:
+- When a user is logged in, show their email (or name from metadata) alongside "My Bookings" in the nav
+- Display a small user avatar/icon with their email truncated for clean UI
+- The "Log In" link only appears when NOT logged in
+- No logout button in the header -- user logs out only from the My Bookings page (as currently designed)
 
-The "waking up server" hint appears because the `signIn` function makes **two** redundant RPC calls to `has_role` (one via `checkAdmin`, another directly), doubling the server round-trips.
+**Session Persistence** (already working):
+- The authentication client is already configured with `persistSession: true` and `autoRefreshToken: true`, so users stay logged in across page refreshes until they explicitly log out. No changes needed here.
 
-## Fix
+### Technical Details
 
-### 1. Prevent redundant admin checks in `signIn` (`src/hooks/useAuth.tsx`)
-
-Remove the duplicate `has_role` RPC call. Instead, after `checkAdmin` completes (which sets `isAdmin` state), read the result directly from a local variable rather than making a second RPC call.
-
-### 2. Skip `onAuthStateChange` re-check during active sign-in (`src/hooks/useAuth.tsx`)
-
-Add a ref (`signingIn`) that is set to `true` during `signIn()` and `false` after. The `onAuthStateChange` listener will skip its `checkAdmin` call when the ref is true, since `signIn` already handled it. This eliminates the race condition entirely.
-
-```text
-signIn() starts --> signingIn = true
-  |-> checkAdmin() --> sets isAdmin
-  |-> returns { isAdmin }
-  |-> signingIn = false
-
-onAuthStateChange fires:
-  if signingIn.current --> skip checkAdmin (already done)
-  else --> proceed normally (e.g., page refresh, token refresh)
-```
-
-### 3. No changes needed to `AdminLogin.tsx` or `AdminGuard.tsx`
-
-The existing login page and guard logic are correct -- the issue is purely in the auth state management.
-
-### Files Changed
-- `src/hooks/useAuth.tsx` -- Add `signingIn` ref, simplify `signIn` to remove duplicate RPC, skip redundant `onAuthStateChange` check during sign-in
+**File: `src/components/public/Header.tsx`**
+- Extract display name from `user.email` (show part before @) or `user.user_metadata?.full_name` if available
+- When logged in, render: `[UserIcon] userName | [CalendarIcon] My Bookings`
+- When logged out, render: `[UserIcon] Log In` (current behavior)
+- Use a `DropdownMenu` or simple inline display for the user info
 
