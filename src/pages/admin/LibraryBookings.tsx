@@ -18,6 +18,7 @@ type Booking = {
   library_id: string | null;
   customer_name: string;
   customer_phone: string | null;
+  customer_email: string | null;
   preferred_shift: string;
   preferred_date: string;
   amount: number | null;
@@ -157,6 +158,7 @@ export default function LibraryBookings() {
               <TableHead>Booking ID</TableHead>
               <TableHead>Library</TableHead>
               <TableHead>Customer</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
               <TableHead>Shift</TableHead>
               <TableHead>Date</TableHead>
@@ -168,11 +170,11 @@ export default function LibraryBookings() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">Loading…</TableCell>
+                <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">Loading…</TableCell>
               </TableRow>
             ) : !filtered.length ? (
               <TableRow>
-                <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">No bookings found.</TableCell>
+                <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">No bookings found.</TableCell>
               </TableRow>
             ) : (
               filtered.map((b) => (
@@ -180,6 +182,7 @@ export default function LibraryBookings() {
                   <TableCell className="font-mono text-xs font-medium">{b.booking_id || "—"}</TableCell>
                   <TableCell className="max-w-[140px] truncate">{b.library_name}</TableCell>
                   <TableCell>{b.customer_name}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">{b.customer_email || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{b.customer_phone || "—"}</TableCell>
                   <TableCell>{b.preferred_shift}</TableCell>
                   <TableCell>{b.preferred_date}</TableCell>
@@ -223,6 +226,7 @@ export default function LibraryBookings() {
                 ["Status", selectedBooking.status],
                 ["Library", selectedBooking.library_name],
                 ["Customer", selectedBooking.customer_name],
+                ["Email", selectedBooking.customer_email || "—"],
                 ["Phone", selectedBooking.customer_phone || "—"],
                 ["Shift", selectedBooking.preferred_shift],
                 ["Date", selectedBooking.preferred_date],

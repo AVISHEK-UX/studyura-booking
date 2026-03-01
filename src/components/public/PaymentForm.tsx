@@ -266,6 +266,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         library_id: libraryId,
         customer_name: data.name,
         customer_phone: data.phone,
+        customer_email: user.email || null,
         preferred_date: new Date().toISOString().split("T")[0],
         preferred_shift: data.shift,
         user_id: user.id,
