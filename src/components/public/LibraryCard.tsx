@@ -34,8 +34,9 @@ function isDiscountActive(d?: Discount | null): boolean {
 
 export default function LibraryCard({ library }: { library: Library }) {
   const pricing = library.pricing as Record<string, number>;
-  const monthlyPrice = pricing?.monthly ?? pricing?.daily;
-  const priceLabel = pricing?.monthly ? "/month" : pricing?.daily ? "/day" : "";
+  const priceEntries = Object.entries(pricing ?? {}).filter(([, v]) => typeof v === "number");
+  const monthlyPrice = pricing?.monthly ?? pricing?.daily ?? (priceEntries.length > 0 ? priceEntries[0][1] : undefined);
+  const priceLabel = pricing?.monthly ? "/month" : pricing?.daily ? "/day" : priceEntries.length > 0 ? `/${priceEntries[0][0]}` : "";
 
   const discount = (library as any).discount as Discount | null | undefined;
   const hasDiscount = isDiscountActive(discount);
