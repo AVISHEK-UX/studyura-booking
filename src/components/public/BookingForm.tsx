@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { useAppConfig } from "@/hooks/useLibraries";
 import { buildWhatsAppUrl } from "@/lib/types";
 import { CheckCircle2, Loader2 } from "lucide-react";
@@ -33,6 +34,7 @@ export default function BookingForm({ libraryName, shifts }: BookingFormProps) {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
+  const { user } = useAuth();
   const { data: appConfig } = useAppConfig();
   const [selectedShift, setSelectedShift] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,6 +50,7 @@ export default function BookingForm({ libraryName, shifts }: BookingFormProps) {
         customer_phone: data.phone || null,
         preferred_date: data.date,
         preferred_shift: data.shift,
+        user_id: user?.id ?? null,
       });
 
       if (error) throw error;
