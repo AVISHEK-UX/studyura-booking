@@ -1,23 +1,31 @@
 
 
-## Show Logged-In User Name in Header
+## Splash Screen with Logo
 
-### What Changes
+### What will happen
+A professional splash screen will appear for ~2.5 seconds when the app first loads, showing the uploaded green "S" hexagon logo centered on a dark background with a smooth fade-in animation, a subtle pulse glow effect, and the "StudySpot" brand name. After the duration, it will smoothly fade out and reveal the home screen.
 
-**Header (`src/components/public/Header.tsx`)**:
-- When a user is logged in, show their email (or name from metadata) alongside "My Bookings" in the nav
-- Display a small user avatar/icon with their email truncated for clean UI
-- The "Log In" link only appears when NOT logged in
-- No logout button in the header -- user logs out only from the My Bookings page (as currently designed)
+### Technical approach
 
-**Session Persistence** (already working):
-- The authentication client is already configured with `persistSession: true` and `autoRefreshToken: true`, so users stay logged in across page refreshes until they explicitly log out. No changes needed here.
+**1. Copy the logo to the project**
+- Copy `user-uploads://logo.png` to `src/assets/logo.png`
 
-### Technical Details
+**2. Create a `SplashScreen` component** (`src/components/SplashScreen.tsx`)
+- Full-screen overlay with a dark background (matching the app's `--foreground` color)
+- Centered logo image with a scale + fade-in entrance animation
+- "StudySpot" text below the logo with a delayed fade-in
+- After ~2.5 seconds, the entire splash fades out over 0.5s
+- Uses `useState` + `useEffect` with a timer to control visibility
+- Once the fade-out animation completes, the component unmounts entirely
 
-**File: `src/components/public/Header.tsx`**
-- Extract display name from `user.email` (show part before @) or `user.user_metadata?.full_name` if available
-- When logged in, render: `[UserIcon] userName | [CalendarIcon] My Bookings`
-- When logged out, render: `[UserIcon] Log In` (current behavior)
-- Use a `DropdownMenu` or simple inline display for the user info
+**3. Update `App.tsx`**
+- Import and render `<SplashScreen />` alongside the existing app content
+- The splash renders as a fixed overlay on top of everything, then disappears
+
+**4. Add splash keyframe animations to `src/index.css`**
+- `splashFadeIn`: opacity 0 to 1 + scale up
+- `splashFadeOut`: opacity 1 to 0
+- `splashPulse`: subtle glow pulse on the logo
+
+No other files will be touched.
 
