@@ -190,7 +190,7 @@ export default function Index() {
               type="button"
               onClick={handleNearMe}
               disabled={locationLoading}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 px-4 py-1.5 text-sm font-medium text-primary-foreground backdrop-blur-sm transition-colors hover:bg-primary/30"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground backdrop-blur-sm transition-colors hover:bg-primary/90"
             >
               <Navigation className="h-3.5 w-3.5" />
               {locationLoading ? "Detecting..." : "Near me"}
