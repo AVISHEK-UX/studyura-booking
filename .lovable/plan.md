@@ -1,32 +1,37 @@
 
 
-## Replace "Continue to WhatsApp" with Slide-to-Confirm Button
+## Add "Seats Left" Feature
 
-### What Changes
+### Overview
+Add a `seats_left` column to the `libraries` table, display it on both the home page library cards and library detail page, and provide an input field in the admin panel to manage it.
 
-The "Continue to WhatsApp" button in the payment receipt view will be replaced with a slide-to-confirm button labeled "Confirm Your Booking". When the user slides to confirm, it will open WhatsApp automatically upon success.
+### Database Migration
+- Add `seats_left` integer column to `libraries` table (nullable, default null — when null, badge is hidden)
 
-### Steps
+### UI Changes
 
-**1. Install framer-motion dependency**
-- Required by the SlideButton component for drag animations
+**1. Library Card (Home Page) — `src/components/public/LibraryCard.tsx`**
+- Show a "X seats left" badge on the card image (bottom-left or top-right), similar to the discount badge
+- Use a distinct color (e.g., amber/orange background) to differentiate from the discount badge
+- Only show when `seats_left` is not null
 
-**2. Create `src/components/ui/slide-button.tsx`**
-- Copy the provided SlideButton component code
-- Adapt it to accept an `onConfirm` callback prop (instead of the hardcoded timeout/status logic)
-- Change the drag handle icon text/label to show "Confirm Your Booking"
-- On successful slide completion, call the `onConfirm` callback which will open WhatsApp
+**2. Library Detail Page — `src/pages/LibraryDetail.tsx`**
+- Show a "X seats left" indicator near the library name or in the booking sidebar
+- Use an icon (e.g., `Users` from lucide) with the count
 
-**3. Update `src/components/public/PaymentForm.tsx`**
-- Replace the "Continue to WhatsApp" `<Button>` block (lines 445-452) with the new SlideButton
-- Pass the WhatsApp URL opening logic as the `onConfirm` prop
-- Keep the "Copy Message" and "Print Receipt" buttons unchanged below it
+**3. Admin Library Edit — `src/pages/admin/LibraryEdit.tsx`**
+- Add a "Seats Left" number input field in the form
+- Include it in the save mutation data
 
-### Technical Details
+**4. Admin Dashboard — `src/pages/admin/Dashboard.tsx`**
+- Show seats left count in both mobile card view and desktop table view for quick visibility
 
+### Files to Change
 | File | Change |
 |------|--------|
-| `package.json` | Add `framer-motion` dependency |
-| `src/components/ui/slide-button.tsx` | New component -- adapted SlideButton with `onConfirm` prop |
-| `src/components/public/PaymentForm.tsx` | Replace WhatsApp button with SlideButton, label "Confirm Your Booking" |
+| DB migration | `ALTER TABLE libraries ADD COLUMN seats_left integer DEFAULT NULL` |
+| `src/components/public/LibraryCard.tsx` | Add seats left badge on card image |
+| `src/pages/LibraryDetail.tsx` | Show seats left indicator |
+| `src/pages/admin/LibraryEdit.tsx` | Add seats left input field + include in save |
+| `src/pages/admin/Dashboard.tsx` | Show seats left in table/cards |
 
