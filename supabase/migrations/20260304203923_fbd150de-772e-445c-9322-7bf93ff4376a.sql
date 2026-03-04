@@ -1,0 +1,1 @@
+ALTER TABLE public.libraries ADD COLUMN seats_left integer DEFAULT NULL;
