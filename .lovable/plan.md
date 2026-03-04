@@ -1,28 +1,17 @@
 
 
-## Add Color-Coded "Seats Left" to Library Detail Page
+## Add Location/Address Search to Home Page
 
-### Changes
+### Change
 
-**`src/pages/LibraryDetail.tsx`**
-- Update the existing seats left badge near the library name to use color-coded urgency:
-  - **Red** (`bg-red-500`): less than 5 seats
-  - **Amber** (`bg-amber-500`): 5–15 seats
-  - **Green** (`bg-emerald-500`): more than 15 seats
+**`src/pages/Index.tsx`**
+- Update the search filter logic so the "Search" input matches against both `library.name` AND `library.address` (case-insensitive)
+- Update the placeholder from "Library name" to "Library name or location"
 
-**`src/components/public/LibraryCard.tsx`**
-- Apply the same color-coding logic to the home page card badge
-
-### Color Logic
-```text
-seats < 5   → red bg    (urgent)
-seats 5-15  → amber bg  (moderate)
-seats > 15  → green bg  (plenty)
-```
+This is a single-line filter change — currently it only checks `lib.name`, we add `|| lib.address?.toLowerCase().includes(...)`.
 
 ### Files to Change
 | File | Change |
 |------|--------|
-| `src/pages/LibraryDetail.tsx` | Color-code the existing seats left badge |
-| `src/components/public/LibraryCard.tsx` | Color-code the card seats left badge |
+| `src/pages/Index.tsx` | Update filter to include address matching + update placeholder text |
 
