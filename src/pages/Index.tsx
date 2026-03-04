@@ -51,7 +51,7 @@ export default function Index() {
     if (!libraries) return [];
     return libraries.filter((lib) => {
       if (selectedCity !== "all" && lib.city !== selectedCity) return false;
-      if (searchName.trim() && !lib.name.toLowerCase().includes(searchName.toLowerCase())) return false;
+      if (searchName.trim() && !lib.name.toLowerCase().includes(searchName.toLowerCase()) && !lib.address?.toLowerCase().includes(searchName.toLowerCase())) return false;
       if (priceRange !== "all") {
         const [min, max] = priceRange.split("-").map(Number);
         const pricing = lib.pricing as Record<string, number>;
@@ -150,7 +150,7 @@ export default function Index() {
                     type="text"
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
-                    placeholder="Library name"
+                    placeholder="Library name or location"
                     className="w-full bg-transparent pb-2.5 pl-10 pr-4 pt-6 text-sm font-medium text-card-foreground placeholder:text-muted-foreground focus:outline-none sm:pb-4 sm:pl-12 sm:pt-8"
                   />
                 </div>
