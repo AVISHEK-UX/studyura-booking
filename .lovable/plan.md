@@ -1,37 +1,28 @@
 
 
-## Add "Seats Left" Feature
+## Add Color-Coded "Seats Left" to Library Detail Page
 
-### Overview
-Add a `seats_left` column to the `libraries` table, display it on both the home page library cards and library detail page, and provide an input field in the admin panel to manage it.
+### Changes
 
-### Database Migration
-- Add `seats_left` integer column to `libraries` table (nullable, default null — when null, badge is hidden)
+**`src/pages/LibraryDetail.tsx`**
+- Update the existing seats left badge near the library name to use color-coded urgency:
+  - **Red** (`bg-red-500`): less than 5 seats
+  - **Amber** (`bg-amber-500`): 5–15 seats
+  - **Green** (`bg-emerald-500`): more than 15 seats
 
-### UI Changes
+**`src/components/public/LibraryCard.tsx`**
+- Apply the same color-coding logic to the home page card badge
 
-**1. Library Card (Home Page) — `src/components/public/LibraryCard.tsx`**
-- Show a "X seats left" badge on the card image (bottom-left or top-right), similar to the discount badge
-- Use a distinct color (e.g., amber/orange background) to differentiate from the discount badge
-- Only show when `seats_left` is not null
-
-**2. Library Detail Page — `src/pages/LibraryDetail.tsx`**
-- Show a "X seats left" indicator near the library name or in the booking sidebar
-- Use an icon (e.g., `Users` from lucide) with the count
-
-**3. Admin Library Edit — `src/pages/admin/LibraryEdit.tsx`**
-- Add a "Seats Left" number input field in the form
-- Include it in the save mutation data
-
-**4. Admin Dashboard — `src/pages/admin/Dashboard.tsx`**
-- Show seats left count in both mobile card view and desktop table view for quick visibility
+### Color Logic
+```text
+seats < 5   → red bg    (urgent)
+seats 5-15  → amber bg  (moderate)
+seats > 15  → green bg  (plenty)
+```
 
 ### Files to Change
 | File | Change |
 |------|--------|
-| DB migration | `ALTER TABLE libraries ADD COLUMN seats_left integer DEFAULT NULL` |
-| `src/components/public/LibraryCard.tsx` | Add seats left badge on card image |
-| `src/pages/LibraryDetail.tsx` | Show seats left indicator |
-| `src/pages/admin/LibraryEdit.tsx` | Add seats left input field + include in save |
-| `src/pages/admin/Dashboard.tsx` | Show seats left in table/cards |
+| `src/pages/LibraryDetail.tsx` | Color-code the existing seats left badge |
+| `src/components/public/LibraryCard.tsx` | Color-code the card seats left badge |
 
