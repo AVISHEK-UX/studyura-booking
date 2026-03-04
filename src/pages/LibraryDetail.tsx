@@ -3,7 +3,7 @@ import { useLibrary } from "@/hooks/useLibraries";
 import Header from "@/components/public/Header";
 import PhotoCarousel from "@/components/public/PhotoCarousel";
 import PaymentForm from "@/components/public/PaymentForm";
-import { ArrowLeft, MapPin, Navigation, IndianRupee, Clock, Wifi, Loader2 } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, IndianRupee, Clock, Wifi, Loader2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Discount {
@@ -80,9 +80,17 @@ export default function LibraryDetail() {
 
             <div>
               <h1 className="font-display text-3xl font-bold text-foreground">{library.name}</h1>
-              <div className="mt-2 flex items-center gap-1.5 text-muted-foreground">
-                <MapPin className="h-4 w-4 shrink-0" />
-                <span>{library.address}</span>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <MapPin className="h-4 w-4 shrink-0" />
+                  <span>{library.address}</span>
+                </div>
+                {(library as any).seats_left != null && (
+                  <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-2.5 py-1 text-xs font-bold text-white">
+                    <Users className="h-3.5 w-3.5" />
+                    {(library as any).seats_left} seats left
+                  </span>
+                )}
               </div>
             </div>
 

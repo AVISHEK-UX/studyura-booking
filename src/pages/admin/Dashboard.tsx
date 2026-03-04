@@ -107,7 +107,12 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Order: {lib.sort_order}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground">Order: {lib.sort_order}</span>
+                  {(lib as any).seats_left != null && (
+                    <span className="rounded bg-amber-500 px-1.5 py-0.5 text-xs font-bold text-white">{(lib as any).seats_left} seats</span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{lib.is_active ? "Active" : "Inactive"}</span>
                   <Switch
@@ -131,6 +136,7 @@ export default function AdminDashboard() {
               <TableHead>Name</TableHead>
               <TableHead>Address</TableHead>
               <TableHead>Order</TableHead>
+              <TableHead>Seats Left</TableHead>
               <TableHead>Active</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -138,11 +144,11 @@ export default function AdminDashboard() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
               </TableRow>
             ) : !libraries?.length ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No libraries yet. Add your first one!</TableCell>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No libraries yet. Add your first one!</TableCell>
               </TableRow>
             ) : (
               libraries.map((lib) => (
@@ -150,6 +156,13 @@ export default function AdminDashboard() {
                   <TableCell className="font-medium">{lib.name}</TableCell>
                   <TableCell className="max-w-[200px] truncate text-muted-foreground">{lib.address}</TableCell>
                   <TableCell>{lib.sort_order}</TableCell>
+                  <TableCell>
+                    {(lib as any).seats_left != null ? (
+                      <span className="rounded bg-amber-500 px-1.5 py-0.5 text-xs font-bold text-white">{(lib as any).seats_left}</span>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Switch
                       checked={lib.is_active}

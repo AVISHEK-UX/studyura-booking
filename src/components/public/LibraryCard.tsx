@@ -76,6 +76,11 @@ export default function LibraryCard({ library }: { library: Library }) {
             {discountLabel}
           </span>
         )}
+        {(library as any).seats_left != null && (
+          <span className="absolute bottom-2 left-2 rounded-md bg-amber-500 px-2 py-1 text-xs font-bold text-white shadow-md">
+            {(library as any).seats_left} seats left
+          </span>
+        )}
       </div>
       <div className="p-4">
         <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1">

@@ -125,6 +125,7 @@ export type Database = {
           name: string
           photos: string[] | null
           pricing: Json
+          seats_left: number | null
           shifts: Json
           short_code: string
           sort_order: number
@@ -143,6 +144,7 @@ export type Database = {
           name: string
           photos?: string[] | null
           pricing?: Json
+          seats_left?: number | null
           shifts?: Json
           short_code?: string
           sort_order?: number
@@ -161,6 +163,7 @@ export type Database = {
           name?: string
           photos?: string[] | null
           pricing?: Json
+          seats_left?: number | null
           shifts?: Json
           short_code?: string
           sort_order?: number

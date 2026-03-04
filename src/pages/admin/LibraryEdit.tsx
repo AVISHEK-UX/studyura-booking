@@ -54,6 +54,7 @@ export default function LibraryEdit() {
   const [pendingPreviews, setPendingPreviews] = useState<string[]>([]);
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [shortCode, setShortCode] = useState("");
+  const [seatsLeft, setSeatsLeft] = useState<string>("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function LibraryEdit() {
       setPhotos(existing.photos ?? []);
       setWhatsappNumber((existing as any).whatsapp_number ?? "");
       setShortCode((existing as any).short_code ?? "");
+      setSeatsLeft((existing as any).seats_left != null ? String((existing as any).seats_left) : "");
     }
   }, [existing]);
 
@@ -85,6 +87,7 @@ export default function LibraryEdit() {
         sort_order: sortOrder, is_active: isActive, photos,
         whatsapp_number: whatsappNumber,
         short_code: shortCode,
+        seats_left: seatsLeft !== "" ? Number(seatsLeft) : null,
         updated_at: new Date().toISOString(),
       };
 
@@ -205,10 +208,14 @@ export default function LibraryEdit() {
           <Input value={googleMapsUrl} onChange={(e) => setGoogleMapsUrl(e.target.value)} className="mt-1" placeholder="https://maps.google.com/..." />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div>
             <Label>Sort Order</Label>
             <Input type="number" value={sortOrder} onChange={(e) => setSortOrder(Number(e.target.value))} className="mt-1" />
+          </div>
+          <div>
+            <Label>Seats Left</Label>
+            <Input type="number" value={seatsLeft} onChange={(e) => setSeatsLeft(e.target.value)} className="mt-1" placeholder="Leave empty to hide" min={0} />
           </div>
           <div className="flex items-end gap-3 pb-1">
             <Label>Active</Label>
