@@ -77,7 +77,7 @@ export default function LibraryCard({ library }: { library: Library }) {
           </span>
         )}
         {(library as any).seats_left != null && (
-          <span className="absolute bottom-2 left-2 rounded-md bg-amber-500 px-2 py-1 text-xs font-bold text-white shadow-md">
+          <span className={`absolute bottom-2 left-2 rounded-md px-2 py-1 text-xs font-bold text-white shadow-md ${(library as any).seats_left < 5 ? 'bg-red-500' : (library as any).seats_left <= 15 ? 'bg-amber-500' : 'bg-emerald-500'}`}>
             {(library as any).seats_left} seats left
           </span>
         )}

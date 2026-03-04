@@ -86,7 +86,7 @@ export default function LibraryDetail() {
                   <span>{library.address}</span>
                 </div>
                 {(library as any).seats_left != null && (
-                  <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-500 px-2.5 py-1 text-xs font-bold text-white">
+                  <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold text-white ${(library as any).seats_left < 5 ? 'bg-red-500' : (library as any).seats_left <= 15 ? 'bg-amber-500' : 'bg-emerald-500'}`}>
                     <Users className="h-3.5 w-3.5" />
                     {(library as any).seats_left} seats left
                   </span>
