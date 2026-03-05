@@ -18,7 +18,7 @@ export default function PhotoCarousel({ photos }: { photos: string[] }) {
 
   if (!photos || photos.length === 0) {
     return (
-      <div className="flex aspect-video items-center justify-center rounded-lg bg-muted">
+      <div className="flex aspect-[4/3] items-center justify-center rounded-lg bg-muted">
         <span className="text-muted-foreground">No photos available</span>
       </div>
     );
@@ -26,7 +26,7 @@ export default function PhotoCarousel({ photos }: { photos: string[] }) {
 
   return (
     <div className="relative overflow-hidden rounded-lg">
-      <div className="aspect-video relative bg-muted">
+      <div className="aspect-[4/3] relative bg-muted">
         {photos.map((url, i) => (
           <img
             key={i}
