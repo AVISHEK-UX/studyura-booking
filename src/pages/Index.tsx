@@ -257,7 +257,7 @@ export default function Index() {
             <a href="mailto:studyura.helpdesk@gmail.com" className="inline-flex items-center gap-1.5 hover:text-primary-foreground/80 transition-colors">
               <Mail className="h-3.5 w-3.5" /> studyura.helpdesk@gmail.com
             </a>
-            <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-primary-foreground/80 transition-colors">
+            <a href="/privacy-policy" className="inline-flex items-center gap-1.5 hover:text-primary-foreground/80 transition-colors">
               Privacy Policy
             </a>
           </div>
