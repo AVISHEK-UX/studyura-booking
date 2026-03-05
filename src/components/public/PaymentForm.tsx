@@ -310,6 +310,14 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         prefill: { name: data.name, email: userEmail, contact: data.phone },
         notes: { library: libraryName, shift: data.shift, plan: data.plan },
         theme: { color: "#2d8a6e" },
+        method: {
+          upi: true,
+          card: true,
+          netbanking: false,
+          wallet: false,
+          emi: false,
+          paylater: false,
+        },
         handler: async (response: any) => {
           try {
             const { data: verifyData, error: verifyErr } = await supabase.functions.invoke(
