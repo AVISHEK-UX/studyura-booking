@@ -1,25 +1,24 @@
 
 
-## Add Razorpay Payment Method Configuration
+## Create Render Blueprint Configuration
 
-### Change
+### Changes
 
-**`src/components/public/PaymentForm.tsx`** — Add a `method` object to the Razorpay checkout options (around line 312, after the `theme` property):
+1. **Create `/render.yaml`** at the project root with this content:
 
-```ts
-method: {
-  upi: true,
-  card: true,
-  netbanking: false,
-  wallet: false,
-  emi: false,
-  paylater: false,
-},
+```yaml
+services:
+  - type: web
+    name: studyura
+    env: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run preview -- --host 0.0.0.0 --port $PORT
 ```
 
-This restricts the Razorpay checkout modal to only show UPI and Card payment options, hiding netbanking, wallets, EMI, and pay-later.
+Note: Using `npm ci && npm run build` as the build command since Render needs to build the production assets first, then `npm run preview` serves them.
 
-| File | Line | Change |
-|------|------|--------|
-| `src/components/public/PaymentForm.tsx` | ~312 | Add `method` config after `theme` |
+2. **Verify `package.json`** — both `build` and `preview` scripts already exist, no changes needed.
+
+That is the only file change required. Once pushed to the main branch via GitHub sync, retry the Render Blueprint deployment.
 
