@@ -17,6 +17,7 @@ import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
 import LibraryDiscounts from "./pages/admin/LibraryDiscounts";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SplashScreen from "./components/SplashScreen";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="library-discounts" element={<LibraryDiscounts />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
