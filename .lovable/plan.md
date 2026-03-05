@@ -1,12 +1,12 @@
 
 
-## Add Privacy Policy Page and Footer Link
+## Add Back Button and Darken Privacy Policy Theme
 
 ### Changes
 
-1. **Create `/src/pages/PrivacyPolicy.tsx`** — A concise privacy policy page for StudyUra covering data collection, usage, cookies, third-party services (Razorpay), contact info, and user rights. Keep it short and professional.
+1. **`src/pages/PrivacyPolicy.tsx`** — Add a back button (using `lucide-react` ArrowLeft icon + react-router `useNavigate`) at the top, styled with the primary green theme. Darken the heading and section title colors to use a deeper green matching the app's accent/primary palette.
 
-2. **Update `src/App.tsx`** — Add route: `<Route path="/privacy-policy" element={<PrivacyPolicy />} />`
-
-3. **Update `src/pages/Index.tsx`** (line ~253) — Add a "Privacy Policy" link in the footer that opens in a new tab using `<a href="/privacy-policy" target="_blank">`.
+   - Add `import { useNavigate } from "react-router-dom"` and `ArrowLeft` icon
+   - Add a back button before the title that navigates back (`navigate(-1)`)
+   - Style section headings with deeper green (`text-primary` or accent color) instead of default `text-foreground`
 
