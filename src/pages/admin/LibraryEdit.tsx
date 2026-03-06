@@ -56,6 +56,7 @@ export default function LibraryEdit() {
   const [shortCode, setShortCode] = useState("");
   const [seatsLeft, setSeatsLeft] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  const [crowdMeter, setCrowdMeter] = useState<{ label: string; percentage: number }[]>([]);
 
   useEffect(() => {
     if (existing) {
@@ -71,6 +72,7 @@ export default function LibraryEdit() {
       setWhatsappNumber((existing as any).whatsapp_number ?? "");
       setShortCode((existing as any).short_code ?? "");
       setSeatsLeft((existing as any).seats_left != null ? String((existing as any).seats_left) : "");
+      setCrowdMeter((existing as any).crowd_meter ?? []);
     }
   }, [existing]);
 
@@ -88,6 +90,7 @@ export default function LibraryEdit() {
         whatsapp_number: whatsappNumber,
         short_code: shortCode,
         seats_left: seatsLeft !== "" ? Number(seatsLeft) : null,
+        crowd_meter: crowdMeter.length > 0 ? crowdMeter : null,
         updated_at: new Date().toISOString(),
       };
 
@@ -221,6 +224,57 @@ export default function LibraryEdit() {
             <Label>Active</Label>
             <Switch checked={isActive} onCheckedChange={setIsActive} />
           </div>
+        </div>
+
+        {/* Crowd Meter */}
+        <div>
+          <Label>Crowd Meter (Student Categories)</Label>
+          <div className="mt-2 space-y-2">
+            {crowdMeter.map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input
+                  value={item.label}
+                  onChange={(e) => {
+                    const updated = [...crowdMeter];
+                    updated[i] = { ...updated[i], label: e.target.value };
+                    setCrowdMeter(updated);
+                  }}
+                  placeholder="e.g. UPSC"
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  value={item.percentage}
+                  onChange={(e) => {
+                    const updated = [...crowdMeter];
+                    updated[i] = { ...updated[i], percentage: Math.min(100, Math.max(0, Number(e.target.value))) };
+                    setCrowdMeter(updated);
+                  }}
+                  placeholder="%"
+                  className="w-20"
+                  min={0}
+                  max={100}
+                />
+                <span className="text-xs text-muted-foreground">%</span>
+                <button
+                  type="button"
+                  onClick={() => setCrowdMeter(crowdMeter.filter((_, j) => j !== i))}
+                  className="rounded-full p-1 text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setCrowdMeter([...crowdMeter, { label: "", percentage: 0 }])}
+            >
+              + Add Category
+            </Button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Show what exams students are preparing for.</p>
         </div>
 
         {/* Photos */}
