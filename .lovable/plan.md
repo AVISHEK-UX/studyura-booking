@@ -1,20 +1,23 @@
 
 
-## Hide Google Login & Ensure Persistent Sessions
+## Swipeable Photo Carousel with Image Counter
+
+### Problem
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
 ### Changes
 
-**1. Hide Google Sign-In button (`src/components/ui/modern-stunning-sign-in.tsx`)**
-- Remove the Google sign-in button (lines 139-164) from the form
-- Remove `onGoogleSignIn` from the props interface (keep it optional so no other files break, but simply don't render the button)
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
 
-**2. Remove Google handler from Login page (`src/pages/Login.tsx`)**
-- Remove the `handleGoogleSignIn` function and the `onGoogleSignIn` prop passed to `SignIn1`
-- Remove unused imports (`lovable`, `supabase`)
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
 
-**3. Session persistence is already solid**
-- The existing `useAuth` hook already calls `supabase.auth.getSession()` on mount and listens via `onAuthStateChange` for token refresh — sessions persist across page reloads
-- The Supabase client is configured with `persistSession: true` and `autoRefreshToken: true`
-- Users only log out when they click "Log Out" explicitly
-- No changes needed here — the current implementation already handles this correctly
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 

@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { SignIn1 } from "@/components/ui/modern-stunning-sign-in";
-import { lovable } from "@/integrations/lovable/index";
-import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -42,7 +40,6 @@ export default function Login() {
       setLoading(false);
       return;
     }
-    // Auto-confirm is on, so sign in immediately
     const { error: signInErr } = await signIn(email, password);
     if (signInErr) {
       setSuccess("Account created! Please log in.");
@@ -52,21 +49,10 @@ export default function Login() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError("");
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result?.error) {
-      setError(result.error instanceof Error ? result.error.message : String(result.error));
-    }
-  };
-
   return (
     <SignIn1
       onSignIn={handleSignIn}
       onSignUp={handleSignUp}
-      onGoogleSignIn={handleGoogleSignIn}
       loading={loading}
       error={error}
       success={success}
