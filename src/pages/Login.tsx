@@ -54,32 +54,11 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     setError("");
-    const isCustomDomain =
-      !window.location.hostname.includes("lovable.app") &&
-      !window.location.hostname.includes("lovableproject.com");
-
-    if (isCustomDomain) {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin,
-          skipBrowserRedirect: true,
-        },
-      });
-      if (error) {
-        setError(error.message);
-        return;
-      }
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } else {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result?.error) {
-        setError(result.error instanceof Error ? result.error.message : String(result.error));
-      }
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result?.error) {
+      setError(result.error instanceof Error ? result.error.message : String(result.error));
     }
   };
 
