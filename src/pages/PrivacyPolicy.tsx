@@ -62,6 +62,52 @@ export default function PrivacyPolicy() {
             <p>You can request access to, correction, or deletion of your personal data at any time by contacting us below.</p>
           </section>
 
+          <div className="border-t border-border my-8" />
+
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="h-5 w-5 text-primary" />
+            <h2 className="text-2xl font-bold tracking-tight text-primary">Terms of Use</h2>
+          </div>
+
+          <section>
+            <h2 className="text-lg font-semibold text-primary mb-2">How to Use StudyUra</h2>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Browse available study libraries by location or search.</li>
+              <li>Select your preferred library, shift (morning/evening/full day), and date.</li>
+              <li>Fill in your details and complete payment via Razorpay to confirm your booking.</li>
+              <li>You will receive a booking confirmation via WhatsApp or email with your seat details.</li>
+              <li>Arrive at the library on your selected date and shift — show your booking confirmation at the front desk.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-primary mb-2">No Refund Policy</h2>
+            <p>All payments made on StudyUra are <strong>non-refundable</strong>. Once a booking is confirmed and payment is processed, no refunds will be issued under any circumstances, including but not limited to:</p>
+            <ul className="list-disc pl-5 space-y-1 mt-2">
+              <li>Change of plans or inability to attend on the booked date.</li>
+              <li>Selecting the wrong library, date, or shift.</li>
+              <li>Personal emergencies or unforeseen circumstances.</li>
+            </ul>
+            <p className="mt-2">Please review your booking details carefully before completing payment.</p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-primary mb-2">User Responsibilities</h2>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Provide accurate personal information during booking.</li>
+              <li>Maintain discipline and silence in the library premises.</li>
+              <li>Follow all rules and guidelines set by the respective library.</li>
+              <li>Do not share or transfer your booking to another person.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold text-primary mb-2">Limitation of Liability</h2>
+            <p>StudyUra acts as a booking platform connecting students with study libraries. We are not responsible for the facilities, services, or conduct at any listed library. Any disputes regarding the library experience should be directed to the respective library management.</p>
+          </section>
+
+          <div className="border-t border-border my-8" />
+
           <section>
             <h2 className="text-lg font-semibold text-primary mb-2">Contact Us</h2>
             <div className="flex flex-col gap-2">
