@@ -1,12 +1,23 @@
 
 
-## Remove Admin Link from Mobile Menu
+## Swipeable Photo Carousel with Image Counter
 
-### Change
-In `src/components/public/Header.tsx`, hide the "Admin" link on mobile by splitting it out of the shared `navLinks` block and only rendering it in the desktop nav.
+### Problem
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
-### Implementation
-- Move the Admin `<Link>` out of `navLinks`
-- Render it only inside the desktop `<nav className="hidden md:flex ...">` section
-- Mobile menu will show: Log In (or user dropdown) + List My Library — no Admin link
+### Changes
+
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
+
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
+
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 

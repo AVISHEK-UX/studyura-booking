@@ -82,13 +82,6 @@ export default function Header() {
         <MessageCircle className="h-4 w-4" />
         List My Library
       </a>
-      <Link
-        to="/admin/login"
-        onClick={() => setMobileOpen(false)}
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        Admin
-      </Link>
     </>
   );
 
@@ -119,6 +112,12 @@ export default function Header() {
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-3">
               {navLinks}
+              <Link
+                to="/admin/login"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Admin
+              </Link>
             </nav>
 
             {/* Mobile hamburger */}
