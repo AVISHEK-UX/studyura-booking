@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,8 +18,9 @@ import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
 import LibraryDiscounts from "./pages/admin/LibraryDiscounts";
 import NotFound from "./pages/NotFound";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SplashScreen from "./components/SplashScreen";
+
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -73,7 +75,7 @@ const App = () => (
               <Route path="library-discounts" element={<LibraryDiscounts />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/privacy-policy" element={<Suspense fallback={null}><PrivacyPolicy /></Suspense>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
