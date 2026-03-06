@@ -131,15 +131,39 @@ export default function LibraryCard({ library }: { library: Library }) {
         {(() => {
           const cm = (library as any).crowd_meter as { label: string; percentage: number }[] | null;
           if (!cm || cm.length === 0) return null;
-          const top = cm.sort((a, b) => b.percentage - a.percentage).slice(0, 3);
+          const sorted = [...cm].sort((a, b) => b.percentage - a.percentage).slice(0, 4);
+          const total = sorted.reduce((s, c) => s + c.percentage, 0);
+          const colors = [
+            "bg-primary",
+            "bg-emerald-500",
+            "bg-amber-500",
+            "bg-violet-500",
+          ];
+          const dotColors = [
+            "bg-primary",
+            "bg-emerald-500",
+            "bg-amber-500",
+            "bg-violet-500",
+          ];
           return (
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
-              {top.map((item) => (
-                <span key={item.label} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-                  <GraduationCap className="h-3 w-3" />
-                  {item.label}
-                </span>
-              ))}
+            <div className="mt-3 space-y-1.5">
+              <div className="flex h-2 w-full overflow-hidden rounded-full bg-secondary/50">
+                {sorted.map((cat, i) => (
+                  <div
+                    key={cat.label}
+                    className={`${colors[i]} transition-all duration-500 ${i === 0 ? 'rounded-l-full' : ''} ${i === sorted.length - 1 ? 'rounded-r-full' : ''}`}
+                    style={{ width: `${total > 0 ? (cat.percentage / total) * 100 : 0}%` }}
+                  />
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+                {sorted.map((cat, i) => (
+                  <span key={cat.label} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotColors[i]}`} />
+                    {cat.label} {cat.percentage}%
+                  </span>
+                ))}
+              </div>
             </div>
           );
         })()}
