@@ -1,67 +1,23 @@
 
 
-## Fix Google OAuth on Hostinger + Add .htaccess
+## Swipeable Photo Carousel with Image Counter
 
 ### Problem
-On a custom domain (Hostinger), the `lovable.auth.signInWithOAuth` flow fails because Lovable's auth-bridge only works on `*.lovable.app` domains. The OAuth redirect gets intercepted and breaks.
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
-### Solution — Two Changes
+### Changes
 
-**1. `src/pages/Login.tsx`** — Detect custom domain and bypass auth-bridge:
-- If hostname is NOT `lovable.app` or `lovableproject.com`, use `supabase.auth.signInWithOAuth` directly with `skipBrowserRedirect: true`
-- Validate the returned OAuth URL points to `accounts.google.com` before redirecting
-- On Lovable domains, keep using `lovable.auth.signInWithOAuth` as-is
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
 
-```typescript
-const handleGoogleSignIn = async () => {
-  setError("");
-  const isCustomDomain =
-    !window.location.hostname.includes("lovable.app") &&
-    !window.location.hostname.includes("lovableproject.com");
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
 
-  if (isCustomDomain) {
-    // Bypass auth-bridge — direct Supabase OAuth
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-        skipBrowserRedirect: true,
-      },
-    });
-    if (error) { setError(error.message); return; }
-    if (data?.url) {
-      const url = new URL(data.url);
-      if (url.hostname !== "accounts.google.com") {
-        setError("Invalid OAuth redirect"); return;
-      }
-      window.location.href = data.url;
-    }
-  } else {
-    // Lovable domain — use managed auth-bridge
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result?.error) {
-      setError(result.error instanceof Error ? result.error.message : String(result.error));
-    }
-  }
-};
-```
-
-**2. `public/.htaccess`** — Create for Hostinger (Apache) to handle SPA routing:
-- Rewrite all non-file requests to `index.html` so React Router works on refresh/deep links
-
-```apache
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
-</IfModule>
-```
-
-### Important
-You must also ensure your custom domain (e.g. `https://yourdomain.com`) and redirect URL (`https://yourdomain.com/**`) are added in your backend's authentication settings. You can do this from the Lovable Cloud dashboard.
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 
