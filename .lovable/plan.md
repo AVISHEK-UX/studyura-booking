@@ -1,12 +1,23 @@
 
 
-## Add Back Button and Darken Privacy Policy Theme
+## Swipeable Photo Carousel with Image Counter
+
+### Problem
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
 ### Changes
 
-1. **`src/pages/PrivacyPolicy.tsx`** — Add a back button (using `lucide-react` ArrowLeft icon + react-router `useNavigate`) at the top, styled with the primary green theme. Darken the heading and section title colors to use a deeper green matching the app's accent/primary palette.
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
 
-   - Add `import { useNavigate } from "react-router-dom"` and `ArrowLeft` icon
-   - Add a back button before the title that navigates back (`navigate(-1)`)
-   - Style section headings with deeper green (`text-primary` or accent color) instead of default `text-foreground`
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
+
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 
