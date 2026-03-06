@@ -1,0 +1,1 @@
+ALTER TABLE public.libraries ADD COLUMN crowd_meter jsonb DEFAULT NULL;

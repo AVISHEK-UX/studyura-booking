@@ -1,4 +1,4 @@
-import { MapPin, IndianRupee } from "lucide-react";
+import { MapPin, IndianRupee, GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Library } from "@/lib/types";
 import OptimizedImage from "./OptimizedImage";
@@ -128,6 +128,21 @@ export default function LibraryCard({ library }: { library: Library }) {
             )}
           </div>
         )}
+        {(() => {
+          const cm = (library as any).crowd_meter as { label: string; percentage: number }[] | null;
+          if (!cm || cm.length === 0) return null;
+          const top = cm.sort((a, b) => b.percentage - a.percentage).slice(0, 3);
+          return (
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              {top.map((item) => (
+                <span key={item.label} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                  <GraduationCap className="h-3 w-3" />
+                  {item.label}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
       </div>
     </Link>
   );

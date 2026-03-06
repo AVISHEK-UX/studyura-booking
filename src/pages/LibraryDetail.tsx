@@ -3,7 +3,7 @@ import { useLibrary } from "@/hooks/useLibraries";
 import Header from "@/components/public/Header";
 import PhotoCarousel from "@/components/public/PhotoCarousel";
 import PaymentForm from "@/components/public/PaymentForm";
-import { ArrowLeft, MapPin, Navigation, IndianRupee, Clock, Wifi, Loader2, Users } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, IndianRupee, Clock, Wifi, Loader2, Users, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Discount {
@@ -182,6 +182,36 @@ export default function LibraryDetail() {
                 </div>
               </div>
             )}
+
+            {/* Crowd Meter */}
+            {(() => {
+              const crowdMeter = (library as any).crowd_meter as { label: string; percentage: number }[] | null;
+              if (!crowdMeter || crowdMeter.length === 0) return null;
+              return (
+                <div>
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5 text-primary" />
+                    <h2 className="font-display text-xl font-bold text-primary">Students Preparing For</h2>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {crowdMeter.map((item) => (
+                      <div key={item.label}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm font-semibold text-foreground">{item.label}</span>
+                          <span className="text-xs font-bold text-primary">{item.percentage}%</span>
+                        </div>
+                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-700"
+                            style={{ width: `${Math.min(item.percentage, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {/* Right: Booking Form */}
