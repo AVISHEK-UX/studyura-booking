@@ -1,23 +1,32 @@
 
 
-## Swipeable Photo Carousel with Image Counter
+## Add Crowd Meter (Student Exam Categories) Feature
 
-### Problem
-The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
+### Overview
+Add a "crowd meter" section showing what exams the majority of students are preparing for (UPSC, SSC, Banking, etc.) — editable from the admin panel. Displayed as visual progress bars on the library detail page.
 
-### Changes
+### Database Change
+- Add a `crowd_meter` JSONB column (nullable, default null) to `libraries` table
+- Format: `[{"label": "UPSC", "percentage": 40}, {"label": "SSC", "percentage": 30}, ...]`
 
-**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
+### UI Changes
 
-- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
-- Remove the left/right arrow buttons
-- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
-- Keep the dot indicators at the bottom-center
-- Maintain the rounded corners and aspect ratio styling
+**`src/pages/LibraryDetail.tsx`** — Add a "Students Preparing For" section after Amenities:
+- Section heading with a `GraduationCap` icon
+- Each exam category shown as a labeled progress bar with percentage
+- Color-coded bars (primary gradient) with rounded styling matching existing card design
+- Only rendered when `crowd_meter` data exists and has entries
 
-### Technical Approach
-- Import `useEmblaCarousel` directly for lightweight usage with swipe
-- Listen to `select` event to track current slide index
-- Render counter as a small pill overlay: `"1 / 3"`
-- Remove `ChevronLeft`/`ChevronRight` buttons entirely
+**`src/pages/admin/LibraryEdit.tsx`** — Add crowd meter management in admin form:
+- A "Crowd Meter" section with ability to add/remove exam categories
+- Each row: text input for label + number input for percentage (0-100)
+- "Add Category" button to add new rows
+- Simple, clean UI matching existing admin form patterns
+
+**`src/components/public/LibraryCard.tsx`** — Optionally show top 2-3 exam tags as small badges on the card (subtle, non-intrusive)
+
+### Data Flow
+- Admin sets categories and percentages via the edit form
+- Stored as JSONB in `crowd_meter` column
+- Public pages read it and render progress bars
 
