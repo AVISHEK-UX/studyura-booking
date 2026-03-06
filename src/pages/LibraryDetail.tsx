@@ -81,7 +81,7 @@ export default function LibraryDetail() {
             </div>
 
             <div>
-              <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                 {library.name}
               </h1>
               <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -111,7 +111,7 @@ export default function LibraryDetail() {
             {Object.keys(pricing).length > 0 && (
               <div>
                 <div className="flex items-center gap-3">
-                  <h2 className="font-display text-2xl font-bold text-primary">Pricing</h2>
+                  <h2 className="font-display text-xl font-bold text-primary">Pricing</h2>
                   {hasDiscount && discount && (
                     <span className="rounded-full bg-destructive px-3 py-1 text-xs font-bold text-destructive-foreground shadow-sm animate-pulse">
                       {discount.type === "PERCENT" ? `${discount.value}% off` : `₹${discount.value} off`}
@@ -153,7 +153,7 @@ export default function LibraryDetail() {
             {/* Shifts */}
             {shifts.length > 0 && (
               <div>
-                <h2 className="font-display text-2xl font-bold text-primary">Available Shifts</h2>
+                <h2 className="font-display text-xl font-bold text-primary">Available Shifts</h2>
                 <div className="mt-4 flex flex-wrap gap-3">
                   {shifts.map((s) => (
                     <div key={s} className="flex items-center gap-2 rounded-xl border-2 border-border/60 bg-card px-4 py-3 text-sm font-medium shadow-sm hover:border-primary/30 hover:shadow-md transition-all duration-200">
@@ -168,7 +168,7 @@ export default function LibraryDetail() {
             {/* Amenities */}
             {library.amenities && library.amenities.length > 0 && (
               <div>
-                <h2 className="font-display text-2xl font-bold text-primary">Amenities</h2>
+                <h2 className="font-display text-xl font-bold text-primary">Amenities</h2>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {library.amenities.map((a) => (
                     <span
