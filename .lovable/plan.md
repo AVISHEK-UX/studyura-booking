@@ -1,23 +1,32 @@
 
 
-## Swipeable Photo Carousel with Image Counter
+## Redesign Crowd Meter on Library Card — Visual Meter Style
 
-### Problem
-The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
+### Idea
+Replace the current text-badge crowd meter on `LibraryCard` with a visual segmented meter inspired by the reference image. Each exam category gets a colored segment on a horizontal bar, with labels below — showing at a glance what students are preparing for and in what proportion.
 
 ### Changes
 
-**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
+**`src/components/public/LibraryCard.tsx`** — Replace the crowd meter badges (lines 131-145) with a compact visual meter:
 
-- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
-- Remove the left/right arrow buttons
-- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
-- Keep the dot indicators at the bottom-center
-- Maintain the rounded corners and aspect ratio styling
+- Render a single horizontal bar (rounded pill) divided into colored segments proportional to each category's percentage
+- Below the bar, show category labels with matching colored dots
+- Use a gradient of brand colors (primary shades) for each segment
+- Keep it compact — fits naturally in the card without adding bulk
+- Only show when crowd_meter data exists with entries
+
+**Visual layout:**
+```text
+┌──────────────────────────────────────┐
+│ ████████████░░░░░░░░░░░░░░░░░░░░░░░ │  ← segmented bar
+└──────────────────────────────────────┘
+  ● UPSC 45%    ● SSC 30%    ● Banking 25%   ← labels with dots
+```
 
 ### Technical Approach
-- Import `useEmblaCarousel` directly for lightweight usage with swipe
-- Listen to `select` event to track current slide index
-- Render counter as a small pill overlay: `"1 / 3"`
-- Remove `ChevronLeft`/`ChevronRight` buttons entirely
+- Sort categories by percentage descending
+- Assign colors from a predefined palette array (e.g., primary, emerald, amber, violet)
+- Each segment width = `percentage%` of the bar
+- Labels rendered as a flex-wrap row with small colored dots
+- Limit to top 4 categories max on the card for space
 
