@@ -118,6 +118,7 @@ export type Database = {
           amenities: string[] | null
           city: string | null
           created_at: string
+          crowd_meter: Json | null
           discount: Json | null
           google_maps_url: string | null
           id: string
@@ -137,6 +138,7 @@ export type Database = {
           amenities?: string[] | null
           city?: string | null
           created_at?: string
+          crowd_meter?: Json | null
           discount?: Json | null
           google_maps_url?: string | null
           id?: string
@@ -156,6 +158,7 @@ export type Database = {
           amenities?: string[] | null
           city?: string | null
           created_at?: string
+          crowd_meter?: Json | null
           discount?: Json | null
           google_maps_url?: string | null
           id?: string
