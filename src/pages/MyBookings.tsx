@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/public/Header";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function MyBookings() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -117,30 +119,23 @@ export default function MyBookings() {
 }
 
 function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean }) {
-  const handlePrint = () => {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    const date = new Date(booking.preferred_date).toLocaleDateString("en-IN", {
-      day: "2-digit", month: "short", year: "numeric",
-    });
-    printWindow.document.write(`
-      <html><head><title>Booking Receipt</title>
-      <style>
-        body { font-family: system-ui, sans-serif; padding: 40px; max-width: 400px; margin: auto; }
-        h2 { margin-bottom: 4px; }
-        .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #eee; }
-        .label { color: #666; } .value { font-weight: 600; }
-      </style></head><body>
-      <h2>${booking.library_name}</h2>
-      ${booking.booking_id ? `<p style="font-family:monospace;color:#666;margin:4px 0">${booking.booking_id}</p>` : ""}
-      <div class="row"><span class="label">Date</span><span class="value">${date}</span></div>
-      <div class="row"><span class="label">Shift</span><span class="value">${booking.preferred_shift}</span></div>
-      ${booking.amount ? `<div class="row"><span class="label">Amount</span><span class="value">₹${booking.amount}${booking.plan ? ` (${booking.plan})` : ""}</span></div>` : ""}
-      <div class="row"><span class="label">Status</span><span class="value">${booking.status || "Active"}</span></div>
-      </body></html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+  const [printing, setPrinting] = useState(false);
+
+  const handlePrint = async () => {
+    setPrinting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-receipt-pdf", {
+        body: { bookingId: booking.id },
+      });
+      if (error || !data?.pdfUrl) {
+        throw new Error(error?.message || "Failed to generate receipt");
+      }
+      window.open(data.pdfUrl, "_blank");
+    } catch (err: any) {
+      toast.error(err.message || "Could not generate receipt");
+    } finally {
+      setPrinting(false);
+    }
   };
 
   return (
@@ -191,10 +186,11 @@ function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean 
         variant="outline"
         size="sm"
         onClick={handlePrint}
+        disabled={printing}
         className="mt-3 w-full gap-2 text-xs"
       >
-        <Printer className="h-3.5 w-3.5" />
-        Print Receipt
+        {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+        {printing ? "Generating…" : "Print Receipt"}
       </Button>
     </div>
   );
