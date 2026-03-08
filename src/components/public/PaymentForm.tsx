@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, Loader2, IndianRupee, Printer, MessageCircle, Copy, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { openExternalUrl } from "@/lib/capacitor-utils";
 
 declare global {
   interface Window {
@@ -192,7 +193,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
       if (error || !data?.pdfUrl) {
         throw new Error(error?.message || "Failed to generate receipt");
       }
-      window.open(data.pdfUrl, "_blank");
+      await openExternalUrl(data.pdfUrl);
     } catch (err: any) {
       toast.error(err.message || "Could not generate receipt");
     } finally {
@@ -346,7 +347,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
             });
 
             if (whatsappUrl) {
-              setTimeout(() => window.open(whatsappUrl, "_blank"), 2000);
+              setTimeout(() => openExternalUrl(whatsappUrl), 2000);
             }
           } catch (e) {
             console.error("Verification error:", e);
@@ -436,7 +437,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         <div className="flex flex-col gap-2">
           {receipt.whatsappUrl && (
             <SlideButton
-              onConfirm={() => window.open(receipt.whatsappUrl, "_blank")}
+              onConfirm={() => openExternalUrl(receipt.whatsappUrl)}
               label="Confirm Your Booking"
             />
           )}

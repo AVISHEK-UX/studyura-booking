@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { openExternalUrl } from "@/lib/capacitor-utils";
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
@@ -73,15 +74,14 @@ export default function Header() {
           </Link>
         )
       )}
-      <a
-        href="https://wa.me/918960031211?text=I%20need%20to%20list%20my%20library"
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        type="button"
+        onClick={() => openExternalUrl("https://wa.me/918960031211?text=I%20need%20to%20list%20my%20library")}
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         <MessageCircle className="h-4 w-4" />
         List My Library
-      </a>
+      </button>
     </>
   );
 

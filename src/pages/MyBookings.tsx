@@ -8,6 +8,7 @@ import Header from "@/components/public/Header";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
 import { toast } from "sonner";
+import { openExternalUrl } from "@/lib/capacitor-utils";
 
 export default function MyBookings() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -154,7 +155,7 @@ function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean 
       if (error || !data?.pdfUrl) {
         throw new Error(error?.message || "Failed to generate receipt");
       }
-      window.open(data.pdfUrl, "_blank");
+      await openExternalUrl(data.pdfUrl);
     } catch (err: any) {
       toast.error(err.message || "Could not generate receipt");
     } finally {
