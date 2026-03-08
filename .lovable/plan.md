@@ -1,17 +1,23 @@
 
 
-## Make Entire Mobile Header Bar Tappable
+## Swipeable Photo Carousel with Image Counter
 
-The user wants the whole rectangular header bar on mobile to act as a touch target that toggles the mobile menu (same as tapping the hamburger icon).
+### Problem
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
-### Change
+### Changes
 
-**File: `src/components/public/Header.tsx`**
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
 
-Wrap the `<header>` element on mobile with an `onClick` handler that toggles `mobileOpen` state. Only apply this on mobile (`isMobile` is true). The hamburger icon remains visible as a visual indicator, but the entire bar becomes the tap target.
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
 
-Specifically:
-- Add `onClick={() => isMobile && setMobileOpen(!mobileOpen)}` to the header's inner flex container (the one with logo + hamburger)
-- Add `cursor-pointer` class on mobile to indicate it's tappable
-- Keep the hamburger button but make it non-interactive (`pointer-events-none`) on mobile since the parent handles the click
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 

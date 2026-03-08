@@ -99,12 +99,14 @@ export default function Header() {
           ].join(" ")}
         >
           <div
+            onClick={() => isMobile && setMobileOpen(!mobileOpen)}
             className={[
               "flex items-center justify-between transition-all duration-300 ease-in-out px-6",
               isScrolled && isMobile ? "h-14" : "h-16",
+              isMobile ? "cursor-pointer" : "",
             ].join(" ")}
           >
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2" onClick={(e) => isMobile && e.stopPropagation()}>
               <img src={logo} alt="studyura logo" className={`rounded-lg object-contain transition-all duration-300 ${isScrolled && isMobile ? 'h-7 w-7' : 'h-8 w-8'}`} />
               <span className="font-display text-lg font-bold text-foreground">studyura</span>
             </Link>
@@ -120,14 +122,10 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* Mobile hamburger */}
-            <button
-              className="md:hidden p-2 text-foreground"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle menu"
-            >
+            {/* Mobile hamburger icon (visual only, parent handles click) */}
+            <div className="md:hidden p-2 text-foreground pointer-events-none">
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+            </div>
           </div>
 
           {/* Mobile menu */}
