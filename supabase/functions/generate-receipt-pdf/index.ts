@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
     y -= 20;
     const amount = booking.final_amount ?? booking.amount ?? 0;
     drawText("Amount Paid", 30, y, fontBold, 13, black);
-    drawText(`₹${amount}`, 160, y, fontBold, 13, green);
+    drawText(`Rs.${amount}`, 160, y, fontBold, 13, green);
     y -= 40;
 
     // Footer
