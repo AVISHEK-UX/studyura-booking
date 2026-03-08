@@ -46,6 +46,7 @@ interface PaymentFormProps {
 }
 
 interface ReceiptData {
+  id: string; // UUID row id
   bookingId: string;
   name: string;
   email: string;
