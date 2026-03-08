@@ -355,7 +355,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
               : "";
 
             setReceipt({
-              bookingId, name: data.name, email: userEmail, phone: data.phone,
+              id: draftId, bookingId, name: data.name, email: userEmail, phone: data.phone,
               library: libraryName, shift: data.shift, plan: data.plan,
               baseAmount: base, discountLabel: disc ? disc.label : "",
               finalAmount: payableAmount,
