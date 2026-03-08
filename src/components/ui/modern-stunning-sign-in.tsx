@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 type AuthMode = "signin" | "signup";
