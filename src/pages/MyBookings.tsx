@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import Header from "@/components/public/Header";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 export default function MyBookings() {
@@ -120,8 +120,32 @@ export default function MyBookings() {
 
 function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean }) {
   const [printing, setPrinting] = useState(false);
+  const isMobile = useIsMobile();
 
-  const handlePrint = async () => {
+  const handlePrintDesktop = () => {
+    const w = window.open("", "_blank");
+    if (!w) return;
+    const amount = booking.final_amount ?? booking.amount ?? 0;
+    const dateStr = new Date(booking.preferred_date).toLocaleDateString("en-IN", {
+      day: "2-digit", month: "short", year: "numeric",
+    });
+    w.document.write(`<html><head><title>Receipt</title><style>body{font-family:sans-serif;padding:40px;max-width:500px;margin:auto}h1{color:#2d8a6e}table{width:100%;border-collapse:collapse;margin:20px 0}td{padding:8px 4px;border-bottom:1px solid #eee}td:first-child{color:#888;width:40%}.total{font-size:1.2em;font-weight:bold;color:#2d8a6e}</style></head><body><h1>StudyUra</h1><p>Payment Receipt</p><table>`);
+    if (booking.booking_id) w.document.write(`<tr><td>Booking ID</td><td>${booking.booking_id}</td></tr>`);
+    w.document.write(`<tr><td>Date</td><td>${dateStr}</td></tr>`);
+    if (booking.payment_id) w.document.write(`<tr><td>Payment ID</td><td>${booking.payment_id}</td></tr>`);
+    w.document.write(`<tr><td>Customer</td><td>${booking.customer_name}</td></tr>`);
+    if (booking.customer_email) w.document.write(`<tr><td>Email</td><td>${booking.customer_email}</td></tr>`);
+    if (booking.customer_phone) w.document.write(`<tr><td>Phone</td><td>${booking.customer_phone}</td></tr>`);
+    w.document.write(`<tr><td>Library</td><td>${booking.library_name}</td></tr>`);
+    w.document.write(`<tr><td>Shift</td><td>${booking.preferred_shift}</td></tr>`);
+    if (booking.plan) w.document.write(`<tr><td>Plan</td><td>${booking.plan}</td></tr>`);
+    w.document.write(`<tr><td>Status</td><td>${booking.status}</td></tr>`);
+    w.document.write(`</table><p class="total">Amount Paid: ₹${amount}</p><p style="color:#888;font-size:12px">Thank you for choosing StudyUra!</p></body></html>`);
+    w.document.close();
+    w.print();
+  };
+
+  const handlePrintMobile = async () => {
     setPrinting(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-receipt-pdf", {
@@ -135,6 +159,14 @@ function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean 
       toast.error(err.message || "Could not generate receipt");
     } finally {
       setPrinting(false);
+    }
+  };
+
+  const handlePrint = () => {
+    if (isMobile) {
+      handlePrintMobile();
+    } else {
+      handlePrintDesktop();
     }
   };
 
