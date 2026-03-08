@@ -444,9 +444,9 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
             <Copy className="h-4 w-4" />
             Copy Message
           </Button>
-          <Button onClick={handlePrint} variant="outline" className="w-full gap-2">
-            <Printer className="h-4 w-4" />
-            Print Receipt
+          <Button onClick={handlePrint} variant="outline" className="w-full gap-2" disabled={printingReceipt}>
+            {printingReceipt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Printer className="h-4 w-4" />}
+            {printingReceipt ? "Generating…" : "Print Receipt"}
           </Button>
         </div>
       </div>
