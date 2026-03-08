@@ -87,7 +87,7 @@ export default function Header() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 ease-in-out motion-reduce:transition-none"
+      <div className={`fixed left-0 right-0 z-50 flex justify-center transition-all duration-300 ease-in-out motion-reduce:transition-none ${isMobile ? 'top-2' : 'top-0'}`}
         style={{ padding: isScrolled && isMobile ? '8px 16px 0' : '0' }}
       >
         <header
