@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/public/Header";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function MyBookings() {
   const { user, loading: authLoading, signOut } = useAuth();
