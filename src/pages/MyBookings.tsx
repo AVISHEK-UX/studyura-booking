@@ -186,10 +186,11 @@ function BookingCard({ booking, isCurrent }: { booking: any; isCurrent: boolean 
         variant="outline"
         size="sm"
         onClick={handlePrint}
+        disabled={printing}
         className="mt-3 w-full gap-2 text-xs"
       >
-        <Printer className="h-3.5 w-3.5" />
-        Print Receipt
+        {printing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Printer className="h-3.5 w-3.5" />}
+        {printing ? "Generating…" : "Print Receipt"}
       </Button>
     </div>
   );
