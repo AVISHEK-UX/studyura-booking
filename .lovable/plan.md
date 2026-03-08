@@ -1,23 +1,56 @@
 
+## Fix WhatsApp Redirect & Print Receipt in Android APK (Capacitor WebView)
 
-## Swipeable Photo Carousel with Image Counter
+### Problem Analysis
+The screenshot shows `net::ERR_UNKNOWN_URL_SCHEME` for `whatsapp://send/` URL. This happens because:
 
-### Problem
-The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
+1. **WhatsApp deep links (`https://wa.me/...`) don't work inside Android WebView** - The Capacitor app's WebView cannot open external app schemes directly
+2. **Print receipt also fails** - The `window.open()` for PDF URLs may be blocked in native WebView
 
-### Changes
+### Root Cause
+- Capacitor WebView doesn't handle external app intent URLs (`whatsapp://`, `https://wa.me/`) automatically
+- Need to use Capacitor's App Linking plugin to open external URLs properly
 
-**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
+### Solution
 
-- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
-- Remove the left/right arrow buttons
-- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
-- Keep the dot indicators at the bottom-center
-- Maintain the rounded corners and aspect ratio styling
+**1. Install Capacitor App plugin** (handles external URL intents)
+- Add `@capacitor/app` dependency
 
-### Technical Approach
-- Import `useEmblaCarousel` directly for lightweight usage with swipe
-- Listen to `select` event to track current slide index
-- Render counter as a small pill overlay: `"1 / 3"`
-- Remove `ChevronLeft`/`ChevronRight` buttons entirely
+**2. Create a utility function `openExternalUrl()`**
+- Detect if running in Capacitor (native) using `Capacitor.isNativePlatform()`
+- If native: Use `@capacitor/browser` or `@capacitor/app-launcher` to open URLs
+- If web: Use regular `window.open()`
 
+**3. Update `PaymentForm.tsx`**
+- Replace `window.open(receipt.whatsappUrl, "_blank")` with the new utility
+- Replace `window.open(data.pdfUrl, "_blank")` with the new utility
+
+**4. Update `MyBookings.tsx`**
+- Replace `window.open(data.pdfUrl, "_blank")` with the new utility
+
+**5. Update `Header.tsx`**
+- Replace WhatsApp `<a href>` with click handler using the new utility
+
+### Files to Modify
+- `package.json` - Add `@capacitor/browser` dependency
+- `src/lib/capacitor-utils.ts` - New file for external URL handling
+- `src/components/public/PaymentForm.tsx` - Use new utility
+- `src/pages/MyBookings.tsx` - Use new utility
+- `src/components/public/Header.tsx` - Use new utility
+
+### Technical Details
+```typescript
+// src/lib/capacitor-utils.ts
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
+
+export async function openExternalUrl(url: string): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    await Browser.open({ url });
+  } else {
+    window.open(url, '_blank');
+  }
+}
+```
+
+This approach uses Capacitor's Browser plugin which handles WhatsApp links correctly on Android by opening the system browser/intent handler.
