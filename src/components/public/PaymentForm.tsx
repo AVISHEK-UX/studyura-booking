@@ -347,7 +347,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
             });
 
             if (whatsappUrl) {
-              setTimeout(() => window.open(whatsappUrl, "_blank"), 2000);
+              setTimeout(() => openExternalUrl(whatsappUrl), 2000);
             }
           } catch (e) {
             console.error("Verification error:", e);
