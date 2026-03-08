@@ -130,6 +130,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
   const [paymentError, setPaymentError] = useState("");
+  const [printingReceipt, setPrintingReceipt] = useState(false);
   const receiptRef = useRef<HTMLDivElement>(null);
 
   // Auto-fill name & phone from last booking or user metadata
@@ -180,8 +181,6 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
       </div>
     );
   }
-
-  const [printingReceipt, setPrintingReceipt] = useState(false);
 
   const handlePrint = async () => {
     if (!receipt) return;
