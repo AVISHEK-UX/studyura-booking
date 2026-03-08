@@ -181,41 +181,24 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
     );
   }
 
-  const handlePrint = () => {
-    if (!receiptRef.current || !receipt) return;
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    printWindow.document.write(`
-      <!DOCTYPE html><html><head><title>Payment Receipt — ${libraryName}</title>
-      <style>
-        body { font-family: 'Segoe UI', sans-serif; max-width: 480px; margin: 40px auto; padding: 24px; color: #1a1a1a; }
-        .header { text-align: center; border-bottom: 2px solid #2d8a6e; padding-bottom: 16px; margin-bottom: 20px; }
-        .header h1 { font-size: 22px; margin: 0 0 4px; color: #2d8a6e; }
-        .header p { margin: 0; font-size: 13px; color: #666; }
-        .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
-        .row .label { color: #666; } .row .value { font-weight: 600; }
-        .total { font-size: 18px; border-top: 2px solid #2d8a6e; margin-top: 12px; padding-top: 12px; }
-        .footer { text-align: center; margin-top: 24px; font-size: 12px; color: #999; }
-        .badge { display: inline-block; background: #e6f7f0; color: #2d8a6e; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 8px; }
-        .discount { color: #c0392b; font-size: 13px; }
-      </style></head><body>
-        <div class="header"><h1>StudyUra</h1><p>Payment Receipt</p><span class="badge">✓ Payment Successful</span></div>
-        <div class="row"><span class="label">Booking ID</span><span class="value">${receipt.bookingId}</span></div>
-        <div class="row"><span class="label">Receipt Date</span><span class="value">${receipt.date}</span></div>
-        <div class="row"><span class="label">Payment ID</span><span class="value">${receipt.paymentId}</span></div>
-        <div class="row"><span class="label">Customer</span><span class="value">${receipt.name}</span></div>
-        <div class="row"><span class="label">Email</span><span class="value">${receipt.email}</span></div>
-        <div class="row"><span class="label">Phone</span><span class="value">${receipt.phone}</span></div>
-        <div class="row"><span class="label">Library</span><span class="value">${receipt.library}</span></div>
-        <div class="row"><span class="label">Shift</span><span class="value">${receipt.shift}</span></div>
-        <div class="row"><span class="label">Plan</span><span class="value">${receipt.plan}</span></div>
-        ${receipt.discountLabel ? `<div class="row discount"><span class="label">Discount</span><span class="value">${receipt.discountLabel}</span></div>` : ""}
-        <div class="row total"><span class="label">Amount Paid</span><span class="value">₹${receipt.finalAmount}</span></div>
-        <div class="footer">Thank you for choosing StudyUra!<br/>This is a computer-generated receipt.</div>
-      </body></html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
+  const [printingReceipt, setPrintingReceipt] = useState(false);
+
+  const handlePrint = async () => {
+    if (!receipt) return;
+    setPrintingReceipt(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-receipt-pdf", {
+        body: { bookingId: receipt.id },
+      });
+      if (error || !data?.pdfUrl) {
+        throw new Error(error?.message || "Failed to generate receipt");
+      }
+      window.open(data.pdfUrl, "_blank");
+    } catch (err: any) {
+      toast.error(err.message || "Could not generate receipt");
+    } finally {
+      setPrintingReceipt(false);
+    }
   };
 
   const handleCopyMessage = () => {
