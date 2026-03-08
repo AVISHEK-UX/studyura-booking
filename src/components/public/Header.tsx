@@ -87,25 +87,28 @@ export default function Header() {
 
   return (
     <>
-      <div className={`fixed left-0 right-0 z-50 flex justify-center transition-all duration-300 ease-in-out motion-reduce:transition-none ${isMobile ? 'top-2' : 'top-0'}`}
-        style={{ padding: isScrolled && isMobile ? '8px 16px 0' : '0' }}
+      <div
+        className={[
+          "fixed left-0 right-0 z-50 flex justify-center transition-all duration-300 ease-in-out motion-reduce:transition-none",
+          isScrolled && isMobile ? "top-0 px-4 pt-2" : "top-0",
+        ].join(" ")}
       >
         <header
           className={[
             "w-full transition-all duration-300 ease-in-out motion-reduce:transition-none",
             isScrolled && isMobile
-              ? "max-w-[900px] rounded-full bg-white/95 backdrop-blur-xl shadow-lg border border-border/40"
-              : "bg-[#e8e8e8] border-b border-border/20",
+              ? "max-w-[900px] rounded-full bg-background/95 backdrop-blur-xl shadow-lg border border-border/40"
+              : "bg-secondary border-b border-border/20",
           ].join(" ")}
         >
           <div
             className={[
               "flex items-center justify-between transition-all duration-300 ease-in-out px-6",
-              isScrolled && isMobile ? "h-14" : "h-16",
+              isScrolled && isMobile ? "h-12" : "h-16",
             ].join(" ")}
           >
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="studyura logo" className={`rounded-lg object-contain transition-all duration-300 ${isScrolled && isMobile ? 'h-7 w-7' : 'h-8 w-8'}`} />
+              <img src={logo} alt="studyura logo" className={`rounded-lg object-contain transition-all duration-300 ${isScrolled && isMobile ? 'h-6 w-6' : 'h-8 w-8'}`} />
               <span className="font-display text-lg font-bold text-foreground">studyura</span>
             </Link>
 
