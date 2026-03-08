@@ -8,6 +8,7 @@ import Header from "@/components/public/Header";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
 import { toast } from "sonner";
+import { openExternalUrl } from "@/lib/capacitor-utils";
 
 export default function MyBookings() {
   const { user, loading: authLoading, signOut } = useAuth();
