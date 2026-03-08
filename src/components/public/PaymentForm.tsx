@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { CheckCircle2, Loader2, IndianRupee, Printer, MessageCircle, Copy, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { openExternalUrl } from "@/lib/capacitor-utils";
 
 declare global {
   interface Window {
