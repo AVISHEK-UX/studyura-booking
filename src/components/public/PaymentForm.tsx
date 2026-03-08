@@ -193,7 +193,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
       if (error || !data?.pdfUrl) {
         throw new Error(error?.message || "Failed to generate receipt");
       }
-      window.open(data.pdfUrl, "_blank");
+      await openExternalUrl(data.pdfUrl);
     } catch (err: any) {
       toast.error(err.message || "Could not generate receipt");
     } finally {
