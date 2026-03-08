@@ -437,7 +437,7 @@ export default function PaymentForm({ libraryId, libraryName, libraryWhatsapp, s
         <div className="flex flex-col gap-2">
           {receipt.whatsappUrl && (
             <SlideButton
-              onConfirm={() => window.open(receipt.whatsappUrl, "_blank")}
+              onConfirm={() => openExternalUrl(receipt.whatsappUrl)}
               label="Confirm Your Booking"
             />
           )}
