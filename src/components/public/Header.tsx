@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { openExternalUrl } from "@/lib/capacitor-utils";
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
