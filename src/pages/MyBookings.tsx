@@ -20,7 +20,7 @@ export default function MyBookings() {
       <div className="min-h-screen pb-20 md:pb-0">
         <Header />
         <div className="flex flex-col items-center justify-center py-28 px-4 text-center">
-          <CalendarDays className="h-14 w-14 text-muted-foreground/40" />
+          <Calendar className="h-14 w-14 text-muted-foreground/40" />
           <h2 className="mt-5 font-display text-xl font-semibold text-foreground">
             Login to see your bookings
           </h2>
