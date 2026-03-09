@@ -1,9 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLibraries } from "@/hooks/useLibraries";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useFavourites } from "@/hooks/useFavourites";
+import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/public/Header";
 import LibraryCard from "@/components/public/LibraryCard";
 import LocationPrompt from "@/components/public/LocationPrompt";
+import RecentlyViewedSection from "@/components/public/RecentlyViewedSection";
 import { BookOpen, MapPin, Search, IndianRupee, Navigation, Phone, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeroSlideshow from "@/components/public/HeroSlideshow";
@@ -20,6 +24,7 @@ const PRICE_RANGES = [
 export default function Index() {
   const { data: libraries, isLoading, error, refetch } = useLibraries();
   const { city: detectedCity, loading: locationLoading, prompted, requestLocation, setPrompted } = useUserLocation();
+  const { recentlyViewedIds } = useRecentlyViewed();
   const [selectedCity, setSelectedCity] = useState("all");
   const [searchName, setSearchName] = useState("");
   const [priceRange, setPriceRange] = useState("all");
@@ -208,6 +213,11 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Recently Viewed */}
+      {libraries && recentlyViewedIds.length > 0 && (
+        <RecentlyViewedSection libraries={libraries} recentIds={recentlyViewedIds} />
+      )}
 
       {/* Library Grid */}
       <div className={`transition-all duration-500 ease-in-out backdrop-blur-sm py-10 sm:py-14 ${
