@@ -209,7 +209,11 @@ export default function Index() {
       </section>
 
       {/* Library Grid */}
-      <main className="bg-background/95 backdrop-blur-sm py-10 sm:py-14 rounded-t-3xl">
+      <main className={`transition-all duration-500 ease-in-out py-10 sm:py-14 backdrop-blur-sm ${
+        isExpanded
+          ? "bg-background/95 rounded-t-3xl"
+          : "container mx-auto rounded-2xl bg-background/80 my-6"
+      }`}>
         <div className="container">
         <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
           {selectedCity !== "all" ? `Libraries in ${selectedCity}` : "Available Libraries"}
