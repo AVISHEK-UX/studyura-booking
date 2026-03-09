@@ -23,6 +23,15 @@ export default function Index() {
   const [searchName, setSearchName] = useState("");
   const [priceRange, setPriceRange] = useState("all");
   const [showLocationPrompt, setShowLocationPrompt] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsExpanded(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const cities = useMemo(() => {
     if (!libraries) return [];
