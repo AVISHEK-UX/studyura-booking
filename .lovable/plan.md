@@ -1,23 +1,24 @@
 
 
-## Swipeable Photo Carousel with Image Counter
+## Scroll-Expanding Library Grid Background
 
-### Problem
-The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
+**Goal**: Initially the library section appears as a contained rounded card (like before), then as the user scrolls, it smoothly expands to cover the full viewport width and height.
+
+### Approach
+
+Use a scroll listener with `useState` to track scroll position. When scrolled past a threshold (e.g. 100px into the section), transition the `<main>` from a contained rounded card to a full-width background.
 
 ### Changes
 
-**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
+**File: `src/pages/Index.tsx`**
 
-- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
-- Remove the left/right arrow buttons
-- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
-- Keep the dot indicators at the bottom-center
-- Maintain the rounded corners and aspect ratio styling
+1. Add a `useEffect` scroll listener that sets an `isExpanded` state to `true` when `window.scrollY` exceeds a threshold (around 300px)
+2. Apply conditional classes to `<main>`:
+   - **Not expanded**: `container mx-auto rounded-2xl bg-background/80 backdrop-blur-sm` (contained card look)
+   - **Expanded**: `bg-background/95 backdrop-blur-sm rounded-t-3xl` (full-width cover)
+3. Add CSS `transition-all duration-500` for smooth animation between states
+4. Keep the inner `<div className="container">` for content centering in both states, adjusting padding accordingly
 
-### Technical Approach
-- Import `useEmblaCarousel` directly for lightweight usage with swipe
-- Listen to `select` event to track current slide index
-- Render counter as a small pill overlay: `"1 / 3"`
-- Remove `ChevronLeft`/`ChevronRight` buttons entirely
+### Result
+On load, the library grid appears as a floating rounded card over the hero. As the user scrolls down, it smoothly expands to fill the entire viewport width, covering the slideshow background completely.
 
