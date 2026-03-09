@@ -1,23 +1,35 @@
 
 
-## Swipeable Photo Carousel with Image Counter
+## Fix: Only Background Expands on Scroll, Cards Stay Contained
 
-### Problem
-The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
+The user wants:
+- **Background** starts contained (with side gaps visible) and expands to full-width on scroll
+- **Library cards/content** always stay in their contained `container` layout — no change to card sizing
 
-### Changes
+Currently, the `container` class moves between `<main>` and inner `<div>`, which changes the card layout too.
 
-**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
+### Fix in `src/pages/Index.tsx`
 
-- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
-- Remove the left/right arrow buttons
-- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
-- Keep the dot indicators at the bottom-center
-- Maintain the rounded corners and aspect ratio styling
+Wrap `<main>` in an outer `<div>` that handles the background expansion, while `<main>` itself always stays as `<div className="container">`:
 
-### Technical Approach
-- Import `useEmblaCarousel` directly for lightweight usage with swipe
-- Listen to `select` event to track current slide index
-- Render counter as a small pill overlay: `"1 / 3"`
-- Remove `ChevronLeft`/`ChevronRight` buttons entirely
+```tsx
+{/* Expanding background wrapper */}
+<div className={`transition-all duration-500 ease-in-out backdrop-blur-sm ${
+  isExpanded
+    ? "bg-background/95 rounded-t-3xl py-10 sm:py-14"
+    : "py-10 sm:py-14"
+}`}>
+  {/* Contained card (always same size) */}
+  <main className={`container mx-auto transition-all duration-500 ${
+    isExpanded ? "" : "rounded-2xl bg-background/80 p-6 sm:p-10"
+  }`}>
+    <h2>...</h2>
+    {/* grid content */}
+  </main>
+</div>
+```
+
+- **Not scrolled**: outer wrapper has no background, inner `<main>` shows as a rounded card with `bg-background/80`
+- **Scrolled**: outer wrapper gets full-width `bg-background/95`, inner card loses its own background/rounding (merges visually)
+- Cards/content always stay within `container` width
 
