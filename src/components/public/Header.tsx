@@ -107,8 +107,8 @@ export default function Header() {
           className={[
             "w-full transition-all duration-300 ease-in-out motion-reduce:transition-none",
             isScrolled && isMobile
-              ? "max-w-[900px] rounded-full bg-white/95 backdrop-blur-xl shadow-lg border border-border/40"
-              : "bg-[#e8e8e8] border-b border-border/20",
+              ? "max-w-[900px] rounded-full bg-background/95 backdrop-blur-xl shadow-lg border border-border/40"
+              : "bg-background border-b border-border/20",
           ].join(" ")}
         >
           <div
