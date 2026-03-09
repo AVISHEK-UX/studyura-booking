@@ -60,37 +60,41 @@ export default function RecentlyViewedSection({ libraries, recentIds }: Props) {
               <Link
                 key={lib.id}
                 to={`/library/${lib.id}`}
-                className="shrink-0 snap-start w-[40vw] max-w-[180px] group"
+                className="shrink-0 snap-start w-[46vw] max-w-[220px] group"
               >
-                <div className="relative rounded-xl overflow-hidden aspect-square bg-muted">
+                <div className="relative rounded-xl overflow-hidden aspect-[4/5] bg-muted">
                   {lib.photos && lib.photos.length > 0 ? (
                     <OptimizedImage
                       src={getThumbUrl(lib.photos[0])}
                       alt={lib.name}
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      aspectRatio="aspect-square"
+                      aspectRatio="aspect-[4/5]"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-muted-foreground/30 text-3xl">📚</div>
                   )}
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  {/* Heart button */}
                   <button
                     onClick={(e) => handleFavClick(e, lib.id)}
-                    className="absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-background/70 backdrop-blur-sm shadow transition-transform hover:scale-110 active:scale-95"
+                    className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/60 backdrop-blur-sm shadow transition-transform hover:scale-110 active:scale-95"
                     aria-label={fav ? "Remove from favourites" : "Add to favourites"}
                   >
-                    <Heart className={`h-3.5 w-3.5 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"}`} />
+                    <Heart className={`h-4 w-4 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"}`} />
                   </button>
-                </div>
-                <div className="mt-1.5 px-0.5">
-                  <p className="text-sm font-semibold text-primary-foreground line-clamp-1">{lib.name}</p>
-                  <div className="flex items-center gap-1 text-xs text-primary-foreground/60">
-                    {lib.city && (
-                      <>
-                        <MapPin className="h-3 w-3 shrink-0" />
-                        <span className="line-clamp-1">{lib.city}</span>
-                      </>
-                    )}
-                    {price && <span className="ml-auto font-medium">₹{price}</span>}
+                  {/* Info overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <p className="text-sm font-bold text-white line-clamp-1 drop-shadow-md">{lib.name}</p>
+                    <div className="flex items-center justify-between mt-0.5">
+                      {lib.city && (
+                        <div className="flex items-center gap-1 text-xs text-white/80">
+                          <MapPin className="h-3 w-3 shrink-0" />
+                          <span className="line-clamp-1">{lib.city}</span>
+                        </div>
+                      )}
+                      {price && <span className="text-xs font-semibold text-white/90">₹{price}</span>}
+                    </div>
                   </div>
                 </div>
               </Link>
