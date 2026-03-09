@@ -1,9 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { useLibraries } from "@/hooks/useLibraries";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useFavourites } from "@/hooks/useFavourites";
+import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/public/Header";
 import LibraryCard from "@/components/public/LibraryCard";
 import LocationPrompt from "@/components/public/LocationPrompt";
+import RecentlyViewedSection from "@/components/public/RecentlyViewedSection";
 import { BookOpen, MapPin, Search, IndianRupee, Navigation, Phone, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeroSlideshow from "@/components/public/HeroSlideshow";

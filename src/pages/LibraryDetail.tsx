@@ -32,6 +32,11 @@ function calcDiscount(price: number, d: Discount): number {
 export default function LibraryDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: library, isLoading } = useLibrary(id!);
+  const { addRecentlyViewed } = useRecentlyViewed();
+
+  useEffect(() => {
+    if (id) addRecentlyViewed(id);
+  }, [id, addRecentlyViewed]);
 
   if (isLoading) {
     return (
