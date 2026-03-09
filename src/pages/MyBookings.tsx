@@ -116,6 +116,7 @@ export default function MyBookings() {
           </div>
         )}
       </div>
+      <BottomNav />
     </div>
   );
 }
