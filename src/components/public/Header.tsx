@@ -17,6 +17,7 @@ import { openExternalUrl } from "@/lib/capacitor-utils";
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
+  const { data: appConfig } = useAppConfig();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
