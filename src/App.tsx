@@ -18,6 +18,7 @@ import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
 import LibraryDiscounts from "./pages/admin/LibraryDiscounts";
 import NotFound from "./pages/NotFound";
+import Favourites from "./pages/Favourites";
 import SplashScreen from "./components/SplashScreen";
 
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
@@ -75,6 +76,7 @@ const App = () => (
               <Route path="library-discounts" element={<LibraryDiscounts />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
+            <Route path="/favourites" element={<Favourites />} />
             <Route path="/privacy-policy" element={<Suspense fallback={null}><PrivacyPolicy /></Suspense>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

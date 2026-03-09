@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Header from "@/components/public/Header";
+import BottomNav from "@/components/public/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
 import { toast } from "sonner";
@@ -56,7 +57,7 @@ export default function MyBookings() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 md:pb-0">
       <Header />
       <div className="container py-8">
         <div className="flex items-center justify-between">
@@ -115,6 +116,7 @@ export default function MyBookings() {
           </div>
         )}
       </div>
+      <BottomNav />
     </div>
   );
 }
