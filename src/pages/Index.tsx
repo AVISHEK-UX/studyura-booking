@@ -7,6 +7,7 @@ import LocationPrompt from "@/components/public/LocationPrompt";
 import { BookOpen, MapPin, Search, IndianRupee, Navigation, Phone, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import HeroSlideshow from "@/components/public/HeroSlideshow";
+import BottomNav from "@/components/public/BottomNav";
 
 const PRICE_RANGES = [
   { label: "Any Price", value: "all" },
