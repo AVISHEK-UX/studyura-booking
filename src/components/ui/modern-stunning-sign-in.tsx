@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Loader2, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 type AuthMode = "signin" | "signup";
@@ -21,6 +21,8 @@ const avatars = [
 ];
 
 const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: externalError, success }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mode, setMode] = React.useState<AuthMode>("signin");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -29,6 +31,17 @@ const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: e
   const [localError, setLocalError] = React.useState("");
 
   const displayError = localError || externalError;
+
+  const handleBack = () => {
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      navigate(redirect);
+    } else if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +82,7 @@ const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: e
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-auto bg-gradient-to-br from-[hsl(150,25%,8%)] via-[hsl(150,22%,10%)] to-[hsl(152,20%,6%)] px-4 py-12">
       {/* Back button */}
       <button
-        onClick={() => window.history.back()}
+        onClick={handleBack}
         className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
       >
         <ArrowLeft className="h-4 w-4" />
