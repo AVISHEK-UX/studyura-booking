@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Header from "@/components/public/Header";
+import BottomNav from "@/components/public/BottomNav";
 import { Button } from "@/components/ui/button";
 import { Loader2, IndianRupee, Calendar, Clock, BookOpen, LogOut, Printer } from "lucide-react";
 import { toast } from "sonner";
