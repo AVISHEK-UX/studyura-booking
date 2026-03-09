@@ -35,6 +35,20 @@ function isDiscountActive(d?: Discount | null): boolean {
 }
 
 export default function LibraryCard({ library }: { library: Library }) {
+  const { user } = useAuth();
+  const { isFavourite, toggleFavourite } = useFavourites();
+  const navigate = useNavigate();
+  const fav = isFavourite(library.id);
+
+  const handleFavClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    toggleFavourite(library.id);
+  };
   const pricing = library.pricing as Record<string, number>;
   const priceEntries = Object.entries(pricing ?? {}).filter(([, v]) => typeof v === "number");
   const monthlyPrice = pricing?.monthly ?? pricing?.daily ?? (priceEntries.length > 0 ? priceEntries[0][1] : undefined);
