@@ -21,6 +21,8 @@ const avatars = [
 ];
 
 const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: externalError, success }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mode, setMode] = React.useState<AuthMode>("signin");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -29,6 +31,17 @@ const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: e
   const [localError, setLocalError] = React.useState("");
 
   const displayError = localError || externalError;
+
+  const handleBack = () => {
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      navigate(redirect);
+    } else if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
