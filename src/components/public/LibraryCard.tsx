@@ -1,7 +1,9 @@
-import { MapPin, IndianRupee, GraduationCap } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MapPin, IndianRupee, Heart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import type { Library } from "@/lib/types";
 import OptimizedImage from "./OptimizedImage";
+import { useFavourites } from "@/hooks/useFavourites";
+import { useAuth } from "@/hooks/useAuth";
 
 function getThumbUrl(url: string): string {
   try {
