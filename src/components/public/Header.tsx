@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X } from "lucide-react";
+import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X, Headset } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAppConfig } from "@/hooks/useLibraries";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -16,6 +17,7 @@ import { openExternalUrl } from "@/lib/capacitor-utils";
 
 export default function Header() {
   const { user, loading, signOut } = useAuth();
+  const { data: appConfig } = useAppConfig();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -73,6 +75,16 @@ export default function Header() {
             Log In
           </Link>
         )
+      )}
+      {appConfig?.whatsapp_number && (
+        <button
+          type="button"
+          onClick={() => openExternalUrl(`https://wa.me/${appConfig.whatsapp_number}?text=${encodeURIComponent("Hi, I need help with studyura app.")}`)}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Headset className="h-4 w-4" />
+          Get Support
+        </button>
       )}
       <button
         type="button"
