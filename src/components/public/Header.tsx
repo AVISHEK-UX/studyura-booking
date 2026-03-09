@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X } from "lucide-react";
+import { User, CalendarDays, MessageCircle, LogOut, ChevronDown, Menu, X, Headset } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAppConfig } from "@/hooks/useLibraries";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
