@@ -47,7 +47,7 @@ export default function RecentlyViewedSection({ libraries, recentIds }: Props) {
   return (
     <section className="px-4 py-6">
       <div className="container">
-        <h3 className="font-display text-lg font-bold text-primary-foreground sm:text-xl mb-3">
+        <h3 className="font-display text-2xl font-bold text-foreground sm:text-3xl mb-3">
           Recently viewed →
         </h3>
         <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide" style={{ WebkitOverflowScrolling: "touch" }}>
