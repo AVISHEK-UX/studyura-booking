@@ -76,6 +76,16 @@ export default function Header() {
           </Link>
         )
       )}
+      {appConfig?.whatsapp_number && (
+        <button
+          type="button"
+          onClick={() => openExternalUrl(`https://wa.me/${appConfig.whatsapp_number}?text=${encodeURIComponent("Hi, I need help with studyura app.")}`)}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Headset className="h-4 w-4" />
+          Get Support
+        </button>
+      )}
       <button
         type="button"
         onClick={() => openExternalUrl("https://wa.me/918960031211?text=I%20need%20to%20list%20my%20library")}
