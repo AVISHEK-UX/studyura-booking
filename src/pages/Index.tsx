@@ -95,7 +95,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 md:pb-0">
       <LocationPrompt
         open={showLocationPrompt}
         loading={locationLoading}
