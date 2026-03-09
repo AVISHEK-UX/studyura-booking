@@ -57,7 +57,7 @@ export default function MyBookings() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-20 md:pb-0">
       <Header />
       <div className="container py-8">
         <div className="flex items-center justify-between">
