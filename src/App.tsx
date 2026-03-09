@@ -18,6 +18,7 @@ import AdminSettings from "./pages/admin/Settings";
 import LibraryBookings from "./pages/admin/LibraryBookings";
 import LibraryDiscounts from "./pages/admin/LibraryDiscounts";
 import NotFound from "./pages/NotFound";
+import Favourites from "./pages/Favourites";
 import SplashScreen from "./components/SplashScreen";
 
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
