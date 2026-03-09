@@ -1,28 +1,23 @@
 
 
-## Move Recently Viewed Inside the Expanding Background
+## Swipeable Photo Carousel with Image Counter
 
-Currently, `RecentlyViewedSection` sits **above** the expanding background `<div>`. The fix is simple: move it **inside** that wrapper so it shares the same `bg-background/95` backdrop.
+### Problem
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
-### Change in `src/pages/Index.tsx`
+### Changes
 
-Move the `RecentlyViewedSection` render from lines 217-220 (above the grid wrapper) to inside the expanding background div (after line 227, before `<main>`):
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
 
-```text
-Before:
-  RecentlyViewedSection          ← outside background
-  <div bg-background wrapper>   ← expanding background
-    <main> grid </main>
-  </div>
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
 
-After:
-  <div bg-background wrapper>   ← expanding background
-    RecentlyViewedSection        ← now inside
-    <main> grid </main>
-  </div>
-```
-
-- Remove the `RecentlyViewedSection` from its current position (lines 217-220)
-- Place it inside the expanding background `<div>` at lines 223-227, right before `<main>`
-- The section's existing `container` class will keep content properly contained
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 
