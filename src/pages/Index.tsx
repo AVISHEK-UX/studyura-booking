@@ -24,6 +24,7 @@ const PRICE_RANGES = [
 export default function Index() {
   const { data: libraries, isLoading, error, refetch } = useLibraries();
   const { city: detectedCity, loading: locationLoading, prompted, requestLocation, setPrompted } = useUserLocation();
+  const { recentlyViewedIds } = useRecentlyViewed();
   const [selectedCity, setSelectedCity] = useState("all");
   const [searchName, setSearchName] = useState("");
   const [priceRange, setPriceRange] = useState("all");
