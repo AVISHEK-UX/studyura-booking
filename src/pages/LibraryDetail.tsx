@@ -1,5 +1,7 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { useLibrary } from "@/hooks/useLibraries";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import Header from "@/components/public/Header";
 import PhotoCarousel from "@/components/public/PhotoCarousel";
 import PaymentForm from "@/components/public/PaymentForm";
