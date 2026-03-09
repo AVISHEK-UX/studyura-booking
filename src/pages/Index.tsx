@@ -200,8 +200,8 @@ export default function Index() {
       </section>
 
       {/* Library Grid */}
-      <main className="container py-10 sm:py-14">
-        <div className="rounded-2xl bg-background/80 backdrop-blur-sm p-6 sm:p-10">
+      <main className="bg-background/95 backdrop-blur-sm py-10 sm:py-14 rounded-t-3xl">
+        <div className="container">
         <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
           {selectedCity !== "all" ? `Libraries in ${selectedCity}` : "Available Libraries"}
         </h2>

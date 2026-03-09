@@ -1,18 +1,23 @@
 
 
-## Expand Library Grid Background to Cover Full Width
+## Swipeable Photo Carousel with Image Counter
 
-The screenshots show the library grid section has a rounded container (`rounded-2xl bg-background/80`) with the hero slideshow visible behind it on the sides and bottom. The user wants this background to stretch edge-to-edge so it covers all remaining space.
+### Problem
+The current `PhotoCarousel` uses arrow buttons for navigation. The user wants touch/swipe support (like other websites) and an image counter indicator (e.g., "1 / 3").
 
-### Change
+### Changes
 
-**File: `src/pages/Index.tsx`** (lines 202-204)
+**`src/components/public/PhotoCarousel.tsx`** — Replace the custom carousel with Embla Carousel (already installed) for native touch/swipe support:
 
-Replace the current `<main>` with a full-width background wrapper, moving the container inside:
+- Use `embla-carousel-react` for swipe gesture handling (already a dependency)
+- Remove the left/right arrow buttons
+- Add an image counter label (e.g., "1 / 3") overlay at the bottom-right
+- Keep the dot indicators at the bottom-center
+- Maintain the rounded corners and aspect ratio styling
 
-- Change `<main className="container py-10 sm:py-14">` to `<main className="bg-background/95 backdrop-blur-sm py-10 sm:py-14">`  — full-width background, no container constraint
-- Change the inner `<div className="rounded-2xl bg-background/80 backdrop-blur-sm p-6 sm:p-10">` to `<div className="container">` — just use container for content centering, remove the rounded card styling
-- Add `rounded-t-3xl` to `<main>` for a subtle top-edge curve that overlaps the hero nicely
-
-Result: The background fills the entire viewport width and extends to the bottom, covering the slideshow completely once the user scrolls past the hero.
+### Technical Approach
+- Import `useEmblaCarousel` directly for lightweight usage with swipe
+- Listen to `select` event to track current slide index
+- Render counter as a small pill overlay: `"1 / 3"`
+- Remove `ChevronLeft`/`ChevronRight` buttons entirely
 
