@@ -214,6 +214,11 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Recently Viewed */}
+      {libraries && recentlyViewedIds.length > 0 && (
+        <RecentlyViewedSection libraries={libraries} recentIds={recentlyViewedIds} />
+      )}
+
       {/* Library Grid */}
       <div className={`transition-all duration-500 ease-in-out backdrop-blur-sm py-10 sm:py-14 ${
         isExpanded
