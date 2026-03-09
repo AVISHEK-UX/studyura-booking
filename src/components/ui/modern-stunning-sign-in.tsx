@@ -82,7 +82,7 @@ const SignIn1: React.FC<SignIn1Props> = ({ onSignIn, onSignUp, loading, error: e
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-auto bg-gradient-to-br from-[hsl(150,25%,8%)] via-[hsl(150,22%,10%)] to-[hsl(152,20%,6%)] px-4 py-12">
       {/* Back button */}
       <button
-        onClick={() => window.history.back()}
+        onClick={handleBack}
         className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/70 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
       >
         <ArrowLeft className="h-4 w-4" />
