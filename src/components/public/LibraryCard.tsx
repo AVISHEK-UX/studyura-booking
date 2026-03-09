@@ -92,6 +92,15 @@ export default function LibraryCard({ library }: { library: Library }) {
             {discountLabel}
           </span>
         )}
+        <button
+          onClick={handleFavClick}
+          className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/70 backdrop-blur-sm shadow-md transition-transform hover:scale-110 active:scale-95"
+          aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+        >
+          <Heart
+            className={`h-4.5 w-4.5 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"}`}
+          />
+        </button>
         {(library as any).seats_left != null && (
           <span className={`absolute bottom-2 left-2 rounded-md px-2 py-1 text-xs font-bold text-white shadow-md ${(library as any).seats_left < 5 ? 'bg-red-500' : (library as any).seats_left <= 15 ? 'bg-amber-500' : 'bg-emerald-500'}`}>
             {(library as any).seats_left} seats left

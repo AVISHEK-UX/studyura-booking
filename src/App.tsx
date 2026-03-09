@@ -76,6 +76,7 @@ const App = () => (
               <Route path="library-discounts" element={<LibraryDiscounts />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
+            <Route path="/favourites" element={<Favourites />} />
             <Route path="/privacy-policy" element={<Suspense fallback={null}><PrivacyPolicy /></Suspense>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
