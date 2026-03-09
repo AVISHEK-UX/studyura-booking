@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,11 +15,31 @@ export default function MyBookings() {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/login");
-    }
-  }, [authLoading, user, navigate]);
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen pb-20 md:pb-0">
+        <Header />
+        <div className="flex flex-col items-center justify-center py-28 px-4 text-center">
+          <Calendar className="h-14 w-14 text-muted-foreground/40" />
+          <h2 className="mt-5 font-display text-xl font-semibold text-foreground">
+            Login to see your bookings
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Sign in to view and manage your library bookings.
+          </p>
+          <div className="mt-6 flex gap-3">
+            <Button variant="outline" onClick={() => navigate("/")}>
+              Go Home
+            </Button>
+            <Button onClick={() => navigate("/login?redirect=/my-bookings")}>
+              Log In
+            </Button>
+          </div>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["my-bookings", user?.id],
