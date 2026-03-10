@@ -107,30 +107,30 @@ export default function LibraryCard({ library }: { library: Library }) {
           </span>
         )}
       </div>
-      <div className="p-4">
-        <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1">
+      <div className="p-3">
+        <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1">
           {library.name}
         </h3>
-        <div className="mt-1.5 flex items-center gap-1 text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5 shrink-0" />
+        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+          <MapPin className="h-3 w-3 shrink-0" />
           <span className="line-clamp-1">{library.address}</span>
         </div>
         {monthlyPrice && (
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-2 flex items-center gap-2">
             <div className="flex items-center gap-0.5">
-              <IndianRupee className="h-4 w-4 text-primary" />
+              <IndianRupee className="h-3.5 w-3.5 text-primary" />
               {discountedPrice !== null ? (
                 <>
-                  <span className="text-lg font-bold text-primary">{discountedPrice}</span>
-                  <span className="text-sm text-muted-foreground line-through ml-1">₹{monthlyPrice}</span>
+                  <span className="text-base font-bold text-primary">{discountedPrice}</span>
+                  <span className="text-xs text-muted-foreground line-through ml-1">₹{monthlyPrice}</span>
                 </>
               ) : (
-                <span className="text-lg font-bold text-primary">{monthlyPrice}</span>
+                <span className="text-base font-bold text-primary">{monthlyPrice}</span>
               )}
-              <span className="text-sm text-muted-foreground">{priceLabel}</span>
+              <span className="text-xs text-muted-foreground">{priceLabel}</span>
             </div>
             {discountLabel && (
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                 {discountLabel}
               </span>
             )}
