@@ -136,7 +136,7 @@ export default function LibraryCard({ library, compact = false }: { library: Lib
             )}
           </div>
         )}
-        {library.amenities && library.amenities.length > 0 && (
+        {library.amenities && library.amenities.length > 0 && !compact && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {library.amenities.slice(0, 3).map((a) => (
               <span
@@ -153,7 +153,7 @@ export default function LibraryCard({ library, compact = false }: { library: Lib
             )}
           </div>
         )}
-        {(() => {
+        {!compact && (() => {
           const cm = (library as any).crowd_meter as { label: string; percentage: number }[] | null;
           if (!cm || cm.length === 0) return null;
           const sorted = [...cm].sort((a, b) => b.percentage - a.percentage).slice(0, 4);
