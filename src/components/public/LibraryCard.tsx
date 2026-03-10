@@ -80,7 +80,7 @@ export default function LibraryCard({ library, compact = false }: { library: Lib
             src={getThumbUrl(library.photos[0])}
             alt={library.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            aspectRatio="aspect-[4/3]"
+            aspectRatio={compact ? "aspect-[16/9]" : "aspect-[4/3]"}
           />
         ) : (
           <div className="flex h-full items-center justify-center">
