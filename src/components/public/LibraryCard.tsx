@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { MapPin, IndianRupee, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Library } from "@/lib/types";
@@ -39,6 +40,7 @@ export default function LibraryCard({ library }: { library: Library }) {
   const { isFavourite, toggleFavourite } = useFavourites();
   const navigate = useNavigate();
   const fav = isFavourite(library.id);
+  const [animating, setAnimating] = useState(false);
 
   const handleFavClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -47,7 +49,9 @@ export default function LibraryCard({ library }: { library: Library }) {
       navigate("/login");
       return;
     }
+    setAnimating(true);
     toggleFavourite(library.id);
+    setTimeout(() => setAnimating(false), 400);
   };
   const pricing = library.pricing as Record<string, number>;
   const priceEntries = Object.entries(pricing ?? {}).filter(([, v]) => typeof v === "number");
@@ -98,7 +102,7 @@ export default function LibraryCard({ library }: { library: Library }) {
           aria-label={fav ? "Remove from favourites" : "Add to favourites"}
         >
           <Heart
-            className={`h-4.5 w-4.5 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"}`}
+            className={`h-4.5 w-4.5 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"} ${animating ? "animate-heart-pop" : ""}`}
           />
         </button>
         {(library as any).seats_left != null && (
