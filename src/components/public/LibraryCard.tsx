@@ -74,7 +74,7 @@ export default function LibraryCard({ library, compact = false }: { library: Lib
       to={`/library/${library.id}`}
       className="group block overflow-hidden rounded-lg border bg-card shadow-card transition-gpu hover:shadow-card-hover hover:-translate-y-1"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className={`relative overflow-hidden bg-muted ${compact ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
         {library.photos && library.photos.length > 0 ? (
           <OptimizedImage
             src={getThumbUrl(library.photos[0])}
