@@ -107,7 +107,7 @@ export default function LibraryCard({ library, compact = false }: { library: Lib
           </span>
         )}
       </div>
-      <div className="p-3">
+      <div className={compact ? "p-2.5" : "p-3"}>
         <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1">
           {library.name}
         </h3>
