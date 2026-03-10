@@ -34,7 +34,7 @@ function isDiscountActive(d?: Discount | null): boolean {
   return true;
 }
 
-export default function LibraryCard({ library }: { library: Library }) {
+export default function LibraryCard({ library, compact = false }: { library: Library; compact?: boolean }) {
   const { user } = useAuth();
   const { isFavourite, toggleFavourite } = useFavourites();
   const navigate = useNavigate();
@@ -74,13 +74,13 @@ export default function LibraryCard({ library }: { library: Library }) {
       to={`/library/${library.id}`}
       className="group block overflow-hidden rounded-lg border bg-card shadow-card transition-gpu hover:shadow-card-hover hover:-translate-y-1"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className={`relative overflow-hidden bg-muted ${compact ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
         {library.photos && library.photos.length > 0 ? (
           <OptimizedImage
             src={getThumbUrl(library.photos[0])}
             alt={library.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            aspectRatio="aspect-[4/3]"
+            aspectRatio={compact ? "aspect-[16/9]" : "aspect-[4/3]"}
           />
         ) : (
           <div className="flex h-full items-center justify-center">
@@ -107,7 +107,7 @@ export default function LibraryCard({ library }: { library: Library }) {
           </span>
         )}
       </div>
-      <div className="p-3">
+      <div className={compact ? "p-2.5" : "p-3"}>
         <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1">
           {library.name}
         </h3>
@@ -136,7 +136,7 @@ export default function LibraryCard({ library }: { library: Library }) {
             )}
           </div>
         )}
-        {library.amenities && library.amenities.length > 0 && (
+        {library.amenities && library.amenities.length > 0 && !compact && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {library.amenities.slice(0, 3).map((a) => (
               <span
@@ -153,7 +153,7 @@ export default function LibraryCard({ library }: { library: Library }) {
             )}
           </div>
         )}
-        {(() => {
+        {!compact && (() => {
           const cm = (library as any).crowd_meter as { label: string; percentage: number }[] | null;
           if (!cm || cm.length === 0) return null;
           const sorted = [...cm].sort((a, b) => b.percentage - a.percentage).slice(0, 4);

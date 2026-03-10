@@ -263,7 +263,7 @@ export default function Index() {
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((lib, i) => (
               <div key={lib.id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 5) * 80}ms` }}>
-                <LibraryCard library={lib} />
+                <LibraryCard library={lib} compact />
               </div>
             ))}
           </div>
