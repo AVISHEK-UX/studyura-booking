@@ -102,7 +102,7 @@ export default function LibraryCard({ library }: { library: Library }) {
           aria-label={fav ? "Remove from favourites" : "Add to favourites"}
         >
           <Heart
-            className={`h-4.5 w-4.5 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"}`}
+            className={`h-4.5 w-4.5 transition-colors ${fav ? "fill-red-500 text-red-500" : "text-foreground"} ${animating ? "animate-heart-pop" : ""}`}
           />
         </button>
         {(library as any).seats_left != null && (
