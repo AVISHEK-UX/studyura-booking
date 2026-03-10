@@ -34,7 +34,7 @@ function isDiscountActive(d?: Discount | null): boolean {
   return true;
 }
 
-export default function LibraryCard({ library }: { library: Library }) {
+export default function LibraryCard({ library, compact = false }: { library: Library; compact?: boolean }) {
   const { user } = useAuth();
   const { isFavourite, toggleFavourite } = useFavourites();
   const navigate = useNavigate();
