@@ -40,6 +40,7 @@ export default function LibraryCard({ library }: { library: Library }) {
   const { isFavourite, toggleFavourite } = useFavourites();
   const navigate = useNavigate();
   const fav = isFavourite(library.id);
+  const [animating, setAnimating] = useState(false);
 
   const handleFavClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -48,7 +49,9 @@ export default function LibraryCard({ library }: { library: Library }) {
       navigate("/login");
       return;
     }
+    setAnimating(true);
     toggleFavourite(library.id);
+    setTimeout(() => setAnimating(false), 400);
   };
   const pricing = library.pricing as Record<string, number>;
   const priceEntries = Object.entries(pricing ?? {}).filter(([, v]) => typeof v === "number");
